@@ -10,6 +10,7 @@ import { Home } from './pages/Home';
 import { PharmaEncyclopedia } from './pages/PharmaEncyclopedia';
 import { DiseaseEncyclopedia } from './pages/DiseaseEncyclopedia';
 import { SymptomChecker } from './pages/SymptomChecker';
+import { OCRScanner } from './pages/OCRScanner';
 import { StoreLocator } from './pages/StoreLocator';
 import { BloodBankLocator } from './pages/BloodBankLocator';
 import { OrganBankLocator } from './pages/OrganBankLocator';
@@ -36,22 +37,31 @@ const FloatingSOSButton = () => {
 export const MainApp = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedMedId, setSelectedMedId] = useState(null);
+  const [pharmaQuery, setPharmaQuery] = useState('');
 
   const handleSelectMedicine = (id) => {
     setSelectedMedId(id);
     setActiveTab('pharma');
   };
 
+  const handleSearchMedicine = (q) => {
+    setSelectedMedId(null);
+    setPharmaQuery(q || '');
+    setActiveTab('pharma');
+  };
+
   const renderTab = () => {
     switch (activeTab) {
       case 'home':
-        return <Home setActiveTab={setActiveTab} onSelectMedicine={handleSelectMedicine} />;
+        return <Home setActiveTab={setActiveTab} onSelectMedicine={handleSelectMedicine} onSearchMedicine={handleSearchMedicine} />;
       case 'pharma':
-        return <PharmaEncyclopedia preselectedMedId={selectedMedId} />;
+        return <PharmaEncyclopedia preselectedMedId={selectedMedId} initialQuery={pharmaQuery} />;
       case 'disease':
         return <DiseaseEncyclopedia onSelectMedicine={handleSelectMedicine} />;
       case 'symptom':
         return <SymptomChecker />;
+      case 'ocr':
+        return <OCRScanner onSelectMedicine={handleSelectMedicine} />;
       case 'stores':
         return <StoreLocator />;
       case 'blood':
@@ -63,7 +73,7 @@ export const MainApp = () => {
       case 'profile':
         return <UserProfile />;
       default:
-        return <Home setActiveTab={setActiveTab} onSelectMedicine={handleSelectMedicine} />;
+        return <Home setActiveTab={setActiveTab} onSelectMedicine={handleSelectMedicine} onSearchMedicine={handleSearchMedicine} />;
     }
   };
 

@@ -1,16 +1,32 @@
-# React + Vite
+# Nexamed Client (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite single-page application for the Nexamed Digital Healthcare Portal.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev        # http://localhost:5173 (proxies /api → http://localhost:5000)
+```
 
-## React Compiler
+The Vite dev server proxies all `/api` requests to the Express backend on port 5000
+(see `vite.config.js`), so the frontend never hard-codes a backend origin.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Scripts
 
-## Expanding the Oxlint configuration
+| Command        | Description                          |
+|----------------|--------------------------------------|
+| `npm run dev`  | Start the Vite dev server with HMR   |
+| `npm run build`| Production build → `dist/`           |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | Run oxlint over the source           |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Structure
+
+- `src/pages/` — one module per page: Pharma & Disease encyclopedias, Symptom Checker,
+  OCR scanner, Store/Blood/Organ locators, Health News, User Profile, Home
+- `src/context/` — `AuthContext` (JWT + profile), `LanguageContext` (5 languages +
+  Web Speech), `SOSContext` (emergency flow)
+- `src/components/` — Navbar, Footer, SOS modal, medicine card
+
+> Requires the backend server (see the root `README.md`).

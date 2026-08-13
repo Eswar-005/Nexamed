@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { MapPin, Phone, Clock, Navigation, CheckCircle, Search } from 'lucide-react';
 import L from 'leaflet';
 
@@ -10,6 +10,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png'
 });
 
+// Keeps the map centered on the user's current location when it changes
+const MapFlyTo = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, Math.max(map.getZoom(), 12), { duration: 1.2 });
+  }, [center, map]);
+  return null;
+};
+
 export const StoreLocator = () => {
   const [stores, setStores] = useState([]);
   const [cityQuery, setCityQuery] = useState('');
@@ -19,7 +28,7 @@ export const StoreLocator = () => {
 
   const fetchStores = (city = '', lat = userLocation.lat, lng = userLocation.lng) => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/stores?city=${encodeURIComponent(city)}&lat=${lat}&lng=${lng}`)
+    fetch(`/api/stores?city=${encodeURIComponent(city)}&lat=${lat}&lng=${lng}`)
       .then((res) => res.json())
       .then((data) => {
         setStores(data || []);
@@ -105,6 +114,7 @@ export const StoreLocator = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <MapFlyTo center={[userLocation.lat, userLocation.lng]} />
               {stores.map((store) => (
                 <Marker key={store.id} position={[store.latitude, store.longitude]}>
                   <Popup>

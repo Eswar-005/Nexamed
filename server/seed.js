@@ -361,6 +361,33 @@ export const seedDatabase = async () => {
         { effect: 'Diarrhea & Vaginal Candidiasis', severity: 'moderate' },
         { effect: 'Severe Anaphylactic Allergic Reaction (Penicillin sensitivity)', severity: 'severe' }
       ]
+    },
+    {
+      name: 'Evion 400 Capsule',
+      generic_name: 'Vitamin E (Tocopheryl Acetate)',
+      manufacturer: 'Merck Ltd',
+      mrp: 86.00,
+      pack_size: 'strip of 15 soft gelatin capsules',
+      category: 'Vitamin / Supplement',
+      prescription_required: 0,
+      description: 'Antioxidant vitamin E supplement for immune support, skin health, and cardiovascular protection.',
+      compositions: [{ chemical: 'Vitamin E (Tocopheryl Acetate)', strength: '400mg' }],
+      effects: [
+        { effect: 'Mild Nausea', severity: 'mild' },
+        { effect: 'Bleeding Risk (High Dose, Rare)', severity: 'moderate' }
+      ]
+    },
+    {
+      name: 'Vitamin E 400 Generic Capsule',
+      generic_name: 'Vitamin E (Tocopheryl Acetate)',
+      manufacturer: 'Jan Aushadhi Kendra / IDPL',
+      mrp: 32.00,
+      pack_size: 'strip of 15 soft gelatin capsules',
+      category: 'Vitamin / Supplement',
+      prescription_required: 0,
+      description: 'Government-approved affordable generic vitamin E antioxidant supplement.',
+      compositions: [{ chemical: 'Vitamin E (Tocopheryl Acetate)', strength: '400mg' }],
+      effects: [{ effect: 'Mild Nausea', severity: 'mild' }]
     }
   ];
 
@@ -393,7 +420,8 @@ export const seedDatabase = async () => {
     { brand: 'Crocin 650 Advance', sub: 'Paracip 650 Tablet' },
     { brand: 'Pantocid 40 Tablet', sub: 'Pan 40 Tablet' },
     { brand: 'Azithral 500 Tablet', sub: 'Azee 500 Tablet' },
-    { brand: 'Glycomet 500 Tablet', sub: 'Metformin 500 Generic' }
+    { brand: 'Glycomet 500 Tablet', sub: 'Metformin 500 Generic' },
+    { brand: 'Evion 400 Capsule', sub: 'Vitamin E 400 Generic Capsule' }
   ];
 
   for (const pair of substitutePairs) {

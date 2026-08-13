@@ -39,11 +39,25 @@ export const HealthNews = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [bookmarks, setBookmarks] = useState(new Set());
+  const [bookmarks, setBookmarks] = useState(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('nexamed_bookmarks') || '[]'));
+    } catch {
+      return new Set();
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('nexamed_bookmarks', JSON.stringify([...bookmarks]));
+    } catch {
+      // localStorage unavailable — bookmarks stay in-memory only
+    }
+  }, [bookmarks]);
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:5000/api/news')
+    fetch('/api/news')
       .then((res) => res.json())
       .then((data) => {
         setAllNews(data.news || []);
@@ -73,7 +87,8 @@ export const HealthNews = () => {
   const toggleBookmark = (id) => {
     setBookmarks(prev => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };

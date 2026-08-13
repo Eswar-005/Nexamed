@@ -3,9 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import { TabletCard } from '../components/TabletCard';
 import { Search, Pill, ShieldAlert, TrendingDown, X } from 'lucide-react';
 
-export const PharmaEncyclopedia = ({ preselectedMedId }) => {
+export const PharmaEncyclopedia = ({ preselectedMedId, initialQuery }) => {
   const { userAllergies } = useAuth();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery || '');
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedMed, setSelectedMed] = useState(null);
@@ -13,18 +13,18 @@ export const PharmaEncyclopedia = ({ preselectedMedId }) => {
 
   const fetchMedicines = (searchQuery = '') => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/medicines?q=${encodeURIComponent(searchQuery)}`)
+    fetch(`/api/medicines?q=${encodeURIComponent(searchQuery)}`)
       .then((res) => res.json())
       .then((data) => { setMedicines(data || []); setLoading(false); })
       .catch(() => setLoading(false));
   };
 
-  useEffect(() => { fetchMedicines(''); }, []);
+  useEffect(() => { fetchMedicines(initialQuery || ''); }, [initialQuery]);
 
   const handleSearch = (e) => { e.preventDefault(); fetchMedicines(query); };
 
   const openMedicineDetail = (id) => {
-    fetch(`http://localhost:5000/api/medicines/${id}`)
+    fetch(`/api/medicines/${id}`)
       .then((res) => res.json())
       .then((data) => { setSelectedMed(data.medicine); setMedDetails(data); })
       .catch((err) => console.error(err));

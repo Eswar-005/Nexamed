@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSOS } from '../context/SOSContext';
-import { AlertCircle, PhoneCall, MapPin, CheckCircle, ExternalLink, ShieldAlert, X, Timer, Siren } from 'lucide-react';
+import { AlertCircle, PhoneCall, MapPin, CheckCircle, ExternalLink, ShieldAlert, X } from 'lucide-react';
 
 const TOTAL_SECONDS = 10;
 
 export const SOSModal = () => {
-  const { isSOSActive, sosDetails, resolveSOS } = useSOS();
+  const { isSOSActive, sosDetails, error, resolveSOS } = useSOS();
   const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
   const [broadcasting, setBroadcasting] = useState(false);
 
@@ -28,6 +28,28 @@ export const SOSModal = () => {
 
     return () => clearInterval(interval);
   }, [isSOSActive]);
+
+  if (error && !sosDetails) {
+    return (
+      <div
+        className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
+        style={{ backgroundColor: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(24px)', zIndex: 99999 }}
+      >
+        <div className="glass-card-static p-4 text-center rounded-4 animate-scale-in" style={{ maxWidth: '440px', border: '1.5px solid rgba(220,38,38,0.5)' }}>
+          <AlertCircle size={40} color="#dc2626" className="mb-3" />
+          <h2 style={{ fontFamily: 'Outfit', fontWeight: 900, color: '#ef4444', fontSize: '1.3rem' }}>SOS Could Not Be Broadcast</h2>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{error}</p>
+          <div className="d-flex gap-2 mt-3">
+            <a href="tel:108" className="btn w-100 py-2 text-white fw-bold"
+              style={{ background: 'linear-gradient(135deg,#ef4444,#b91c1c)' }}>
+              <PhoneCall size={16} className="me-2" />Call 108 Now
+            </a>
+            <button className="btn btn-glass w-100 py-2 fw-bold" onClick={resolveSOS}>Close</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isSOSActive || !sosDetails) return null;
 

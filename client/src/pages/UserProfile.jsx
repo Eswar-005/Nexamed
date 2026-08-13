@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
-  User, ShieldAlert, Plus, Mail, Lock, Heart,
-  CheckCircle, Eye, EyeOff, PhoneCall, Activity,
-  FileText, Calendar, Clock, AlertCircle, Trash2,
-  Shield, UserCheck, ShieldCheck, FileSpreadsheet,
-  Download, Printer, ChevronRight, ExternalLink, X,
-  AlertTriangle
+  User, ShieldAlert, Plus, Mail, Lock,
+  Eye, EyeOff, PhoneCall, FileText, FileSpreadsheet,
+  Printer, ChevronRight, X
 } from 'lucide-react';
 
 export const UserProfile = () => {
@@ -36,7 +33,7 @@ export const UserProfile = () => {
     setAuthLoading(true);
     const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`/api${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -50,8 +47,8 @@ export const UserProfile = () => {
       const data = await res.json();
       if (!res.ok) { setAuthError(data.error || 'Authentication failed'); }
       else { login(data.token, data.user); }
-    } catch (err) {
-      setAuthError('Connection error. Ensure server is running at localhost:5000.');
+    } catch {
+      setAuthError('Connection error. Ensure the backend server is running.');
     } finally {
       setAuthLoading(false);
     }
@@ -64,7 +61,7 @@ export const UserProfile = () => {
     setAuthError('');
     setAuthLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'demo@nexamed.com', password: 'password123' })
@@ -75,8 +72,8 @@ export const UserProfile = () => {
       } else if (data.token) {
         login(data.token, data.user);
       }
-    } catch (err) {
-      setAuthError('Connection error. Ensure server is running at localhost:5000.');
+    } catch {
+      setAuthError('Connection error. Ensure the backend server is running.');
     } finally {
       setAuthLoading(false);
     }
@@ -87,7 +84,7 @@ export const UserProfile = () => {
     if (!allergenInput) return;
     const updated = [...userAllergies, { allergen: allergenInput, severity: allergySeverity, reaction: allergyReaction }];
     try {
-      await fetch('http://localhost:5000/api/user/profile', {
+      await fetch('/api/user/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ allergies: updated })
@@ -110,6 +107,19 @@ export const UserProfile = () => {
       return { bg: 'rgba(217,119,6,0.12)', color: '#d97706', border: 'rgba(217,119,6,0.3)', badge: '⚠️ Attention' };
     return { bg: 'rgba(5,150,105,0.12)', color: '#059669', border: 'rgba(5,150,105,0.3)', badge: '✓ Normal' };
   };
+
+  // Compute BMI from stored weight/height (fall back to display-only placeholders when unset)
+  const weightKg = parseFloat(userProfile?.weight_kg);
+  const heightCm = parseFloat(userProfile?.height_cm);
+  const bmi = weightKg > 0 && heightCm > 0
+    ? (weightKg / Math.pow(heightCm / 100, 2)).toFixed(1)
+    : null;
+  const bmiLabel = bmi
+    ? bmi < 18.5 ? 'Underweight'
+      : bmi < 25 ? 'Normal Weight'
+      : bmi < 30 ? 'Overweight'
+      : 'Obese'
+    : null;
 
   if (!user) {
     return (
@@ -139,10 +149,29 @@ export const UserProfile = () => {
 
             <form onSubmit={handleAuthSubmit} className="d-flex flex-column gap-3 mb-3">
               {isRegister && (
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>FULL NAME</label>
-                  <input type="text" className="glass-input" placeholder="Rahul Sharma" value={name} onChange={(e) => setName(e.target.value)} required />
-                </div>
+                <>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>FULL NAME</label>
+                    <input type="text" className="glass-input" placeholder="Rahul Sharma" value={name} onChange={(e) => setName(e.target.value)} required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>MOBILE NUMBER</label>
+                    <div className="position-relative">
+                      <PhoneCall size={16} className="position-absolute top-50 start-0 translate-middle-y ms-3"
+                        style={{ color: 'var(--text-dim)', pointerEvents: 'none' }} />
+                      <input type="tel" className="glass-input" style={{ paddingLeft: '40px' }}
+                        placeholder="+91 9876543210" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-dim)', display: 'block', marginBottom: '6px' }}>BLOOD GROUP</label>
+                    <select className="glass-input" value={bloodGroup} onChange={(e) => setBloodGroup(e.target.value)}>
+                      {['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'].map((bg) => (
+                        <option key={bg} value={bg}>{bg}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
               )}
 
               <div>
@@ -265,8 +294,8 @@ export const UserProfile = () => {
               {[
                 { label: 'Mobile Phone', value: user.phone || '+91 9876543210' },
                 { label: 'Date of Birth', value: userProfile?.date_of_birth || '1995-06-15' },
-                { label: 'Weight / Height', value: `${userProfile?.weight_kg || '72.5'} kg / ${userProfile?.height_cm || '175'} cm` },
-                { label: 'Calculated BMI', value: '23.6 kg/m² (Normal Weight)' },
+                { label: 'Weight / Height', value: `${weightKg || '72.5'} kg / ${heightCm || '175'} cm` },
+                { label: 'Calculated BMI', value: bmi ? `${bmi} kg/m² (${bmiLabel})` : '— add weight & height' },
                 { label: 'Diagnostic Reports', value: `${userReports.length} lab report(s)` },
                 { label: 'Allergy Flags', value: `${userAllergies.length} allergen(s)` },
                 { label: 'Chronic Illnesses', value: `${userHistory.length} condition(s)` },

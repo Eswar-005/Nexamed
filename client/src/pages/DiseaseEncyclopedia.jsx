@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   BookOpen, Search, CheckCircle, XCircle,
-  AlertTriangle, Pill, ChevronRight, Shield, Activity, X, Filter
+  AlertTriangle, Pill, ChevronRight, X
 } from 'lucide-react';
 
 const BODY_SYSTEMS = [
@@ -28,7 +28,7 @@ export const DiseaseEncyclopedia = ({ onSelectMedicine }) => {
   );
 
   const fetchDiseases = (q = '') => {
-    fetch(`http://localhost:5000/api/diseases?q=${encodeURIComponent(q)}`)
+    fetch(`/api/diseases?q=${encodeURIComponent(q)}`)
       .then((res) => res.json())
       .then((data) => setDiseases(data || []))
       .catch((err) => console.error(err));
@@ -37,7 +37,7 @@ export const DiseaseEncyclopedia = ({ onSelectMedicine }) => {
   useEffect(() => { fetchDiseases(''); }, []);
 
   const openDiseaseDetail = (id) => {
-    fetch(`http://localhost:5000/api/diseases/${id}`)
+    fetch(`/api/diseases/${id}`)
       .then((res) => res.json())
       .then((data) => { setSelectedDisease(data.disease); setDiseaseDetails(data); })
       .catch((err) => console.error(err));
@@ -296,13 +296,18 @@ export const DiseaseEncyclopedia = ({ onSelectMedicine }) => {
                   </h6>
                   <div className="d-flex flex-column gap-2">
                     {diseaseDetails.linkedMedicines.map((m) => (
-                      <div key={m.id} className="glass-card p-3 d-flex align-items-center justify-content-between">
+                      <button key={m.id} type="button" className="glass-card p-3 d-flex align-items-center justify-content-between w-100 text-start border-0"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => onSelectMedicine(m.id)}>
                         <div>
                           <strong style={{ fontSize: '0.88rem', color: 'var(--text-main)' }}>{m.name}</strong>
                           <div style={{ fontSize: '0.77rem', color: 'var(--text-muted)' }}>{m.usage_note}</div>
                         </div>
-                        <span className="badge-teal" style={{ fontSize: '0.78rem' }}>₹{m.mrp.toFixed(2)}</span>
-                      </div>
+                        <span className="d-flex align-items-center gap-2">
+                          <span className="badge-teal" style={{ fontSize: '0.78rem' }}>₹{m.mrp.toFixed(2)}</span>
+                          <ChevronRight size={16} style={{ color: 'var(--text-dim)' }} />
+                        </span>
+                      </button>
                     ))}
                   </div>
                 </div>

@@ -22,6 +22,7 @@ export const TRANSLATIONS = {
     navOrgan:   'Organ Registry',
     navNews:    'Health News',
     navProfile: 'My Profile',
+    navOcr:     'OCR Medicine Scanner',
 
     // ── Navbar UI labels (no mixed languages) ──
     selectLanguage:  'Select Language',
@@ -169,6 +170,7 @@ export const TRANSLATIONS = {
     navOrgan:   'అవయవ దానం',
     navNews:    'ఆరోగ్య వార్తలు',
     navProfile: 'నా ప్రొఫైల్',
+    navOcr:     'OCR మందుల స్కానర్',
 
     // ── Navbar UI labels ──
     selectLanguage:  'భాషను ఎంచుకోండి',
@@ -316,6 +318,7 @@ export const TRANSLATIONS = {
     navOrgan:   'अंगदान रजिस्ट्री',
     navNews:    'स्वास्थ्य समाचार',
     navProfile: 'मेरा प्रोफाइल',
+    navOcr:     'OCR दवा स्कैनर',
 
     // ── Navbar UI labels ──
     selectLanguage:  'भाषा चुनें',
@@ -463,6 +466,7 @@ export const TRANSLATIONS = {
     navOrgan:   'உறுப்பு தானம்',
     navNews:    'சுகாதார செய்திகள்',
     navProfile: 'என் சுயவிவரம்',
+    navOcr:     'OCR மருந்து ஸ்கேனர்',
 
     // ── Navbar UI labels ──
     selectLanguage:  'மொழியைத் தேர்ந்தெடுக்கவும்',
@@ -610,6 +614,7 @@ export const TRANSLATIONS = {
     navOrgan:   'ಅಂಗದಾನ ನೋಂದಣಿ',
     navNews:    'ಆರೋಗ್ಯ ಸುದ್ದಿಗಳು',
     navProfile: 'ನನ್ನ ಪ್ರೊಫೈಲ್',
+    navOcr:     'OCR ಔಷಧ ಸ್ಕ್ಯಾನರ್',
 
     // ── Navbar UI labels ──
     selectLanguage:  'ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Building2, ChevronRight, Leaf, Tag, AlertTriangle } from 'lucide-react';
+import { Pill, Building2, ChevronRight, Leaf, Tag } from 'lucide-react';
 
 export const TabletCard = ({ med, onSelect }) => {
   const [hovered, setHovered] = useState(false);
@@ -18,9 +18,12 @@ export const TabletCard = ({ med, onSelect }) => {
 
   const catStyle = getCategoryStyle(med.category);
 
-  // Compute savings if generic name differs from brand name
   const hasGeneric = med.generic_name && med.generic_name.toLowerCase() !== med.name.toLowerCase();
-  const savingsPct = hasGeneric ? Math.floor(Math.random() * 35 + 20) : null; // estimative display
+
+  // Real generic savings from the substitutes table (null when no substitute registered)
+  const savingsPct = med.generic_savings_pct
+    ? Math.round(Number(med.generic_savings_pct))
+    : null;
 
   return (
     <div

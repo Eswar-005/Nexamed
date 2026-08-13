@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async (authToken) => {
     try {
-      const res = await fetch('http://localhost:5000/api/user/profile', {
+      const res = await fetch('/api/user/profile', {
         headers: { Authorization: `Bearer ${authToken}` }
       });
       if (res.ok) {

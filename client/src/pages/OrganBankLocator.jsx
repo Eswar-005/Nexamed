@@ -20,7 +20,7 @@ export const OrganBankLocator = () => {
 
   const fetchOrganBanks = (type = selectedType, c = city) => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/organ-banks?type=${encodeURIComponent(type)}&city=${encodeURIComponent(c)}`)
+    fetch(`/api/organ-banks?type=${encodeURIComponent(type)}&city=${encodeURIComponent(c)}`)
       .then((res) => res.json())
       .then((data) => { setOrganBanks(data || []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -116,7 +116,7 @@ export const OrganBankLocator = () => {
       {activeTab === 'centers' ? (
         <>
           {/* Type filter */}
-          <div className="d-flex gap-2 mb-4 flex-wrap">
+          <div className="d-flex gap-2 mb-4 flex-wrap align-items-center">
             {filterTypes.map((ft) => (
               <button key={ft.value}
                 className={selectedType === ft.value ? 'btn-gradient d-flex align-items-center gap-1' : 'btn-glass d-flex align-items-center gap-1'}
@@ -125,6 +125,16 @@ export const OrganBankLocator = () => {
                 {ft.label}
               </button>
             ))}
+            <div className="position-relative" style={{ minWidth: '200px' }}>
+              <input
+                type="text"
+                className="glass-input"
+                style={{ fontSize: '0.83rem' }}
+                placeholder="Search by city (Hyderabad)..."
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') fetchOrganBanks(selectedType, city); }} />
+            </div>
             {organBanks.length > 0 && (
               <span className="badge-teal ms-auto d-flex align-items-center" style={{ fontSize: '0.78rem' }}>
                 {organBanks.length} Centers

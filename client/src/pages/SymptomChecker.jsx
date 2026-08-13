@@ -3,8 +3,8 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   Stethoscope, Activity, CheckSquare, Square,
   AlertTriangle, RefreshCw,
-  Heart, Zap, X,
-  Info, TrendingUp, Award, Shield,
+  Zap, X,
+  TrendingUp, Award, Shield,
   Mic, Volume2, PhoneCall, MessageSquare,
   Users, MapPin, Sparkles, VolumeX, Phone
 } from 'lucide-react';
@@ -57,7 +57,7 @@ export const SymptomChecker = () => {
   const [customText,         setCustomText]         = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/symptoms')
+    fetch('/api/symptoms')
       .then((res) => res.json())
       .then((data) => {
         setGroupedSymptoms(data || {});
@@ -83,7 +83,7 @@ export const SymptomChecker = () => {
     }
     setLoading(true);
     setErrorMsg('');
-    fetch('http://localhost:5000/api/symptom-checker/analyze', {
+    fetch('/api/symptom-checker/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symptomIds: selectedSymptomIds, customText })

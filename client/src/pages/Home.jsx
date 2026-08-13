@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useSOS } from '../context/SOSContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
@@ -7,13 +6,12 @@ import {
   MapPin, Droplet, HeartHandshake, ShieldAlert,
   Newspaper, ChevronRight, Sparkles, PhoneCall,
   Flame, Clock, Zap, Building2, Activity, ArrowRight,
-  CheckCircle2, TrendingDown, Heart, Mic, Volume2, Globe
+  CheckCircle2, Mic
 } from 'lucide-react';
 
-export const Home = ({ setActiveTab, onSelectMedicine }) => {
-  const { user } = useAuth();
+export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine }) => {
   const { triggerSOS } = useSOS();
-  const { t, language, speakAudio } = useLanguage();
+  const { t, language } = useLanguage();
   const [quickQuery, setQuickQuery] = useState('');
   const [newsFeed, setNewsFeed] = useState([]);
   const [dailyTip, setDailyTip] = useState(null);
@@ -21,12 +19,12 @@ export const Home = ({ setActiveTab, onSelectMedicine }) => {
   const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/news')
+    fetch('/api/news')
       .then((res) => res.json())
       .then((data) => { setNewsFeed(data.news || []); setDailyTip(data.dailyTip); })
       .catch(() => {});
 
-    fetch('http://localhost:5000/api/medicines')
+    fetch('/api/medicines')
       .then((res) => res.json())
       .then((data) => setBestsellerMeds(data || []))
       .catch(() => {});
@@ -34,7 +32,7 @@ export const Home = ({ setActiveTab, onSelectMedicine }) => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (quickQuery.trim()) setActiveTab('pharma');
+    if (quickQuery.trim()) onSearchMedicine(quickQuery.trim());
   };
 
   const startVoiceSearch = () => {
@@ -53,7 +51,7 @@ export const Home = ({ setActiveTab, onSelectMedicine }) => {
       const speechResult = event.results[0][0].transcript;
       setQuickQuery(speechResult);
       setIsListening(false);
-      setActiveTab('pharma');
+      onSearchMedicine(speechResult);
     };
     recognition.onerror = () => setIsListening(false);
     recognition.onend = () => setIsListening(false);

@@ -5,13 +5,6 @@ import { AlertTriangle, PhoneCall, HeartHandshake, ShieldCheck, Activity, Heart 
 export const Footer = () => {
   const { t } = useLanguage();
 
-  const helplines = [
-    { number: '108',         labelKey: 'navBlood',  color: '#dc2626', label: 'National Ambulance' },
-    { number: '1800-11-4770', label: 'NOTTO Organ Helpline',       color: '#0d9488' },
-    { number: '1075',         label: 'National Health Helpline',   color: '#0284c7' },
-    { number: '112',          label: 'National Emergency',         color: '#7c3aed' },
-  ];
-
   return (
     <footer className="mt-5" style={{ borderTop: '1px solid var(--border-card)' }}>
       {/* Top gradient bar */}

@@ -5,11 +5,9 @@ import {
   Camera,
   Upload,
   FileText,
-  CheckCircle,
   AlertCircle,
   Pill,
   ChevronRight,
-  RefreshCw,
   Sparkles
 } from 'lucide-react';
 
@@ -81,7 +79,7 @@ export const OCRScanner = ({ onSelectMedicine }) => {
       setStatusText('Matching extracted text against medicine database...');
 
       // Call backend fuzzy Levenshtein match API
-      const res = await fetch('http://localhost:5000/api/ocr/match', {
+      const res = await fetch('/api/ocr/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ extractedText: rawText })
@@ -101,7 +99,7 @@ export const OCRScanner = ({ onSelectMedicine }) => {
     setTimeout(() => {
       const simulatedText = `${sampleName} TABLET\n15 Tablets\nParacetamol 650mg IP\nMfg Micro Labs Ltd\nMRP Rs 34.50`;
       setExtractedText(simulatedText);
-      fetch('http://localhost:5000/api/ocr/match', {
+      fetch('/api/ocr/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ extractedText: simulatedText })

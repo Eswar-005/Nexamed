@@ -163,7 +163,9 @@ router.post('/user/profile', authMiddleware, async (req, res) => {
 router.get('/medicines', async (req, res) => {
   try {
     const { q, category } = req.query;
-    let sql = `SELECT m.*, GROUP_CONCAT(c.chemical_name || ' (' || c.strength || ')', ' + ') as composition_summary
+    let sql = `SELECT m.*,
+               GROUP_CONCAT(c.chemical_name || ' (' || c.strength || ')', ' + ') as composition_summary,
+               (SELECT MAX(s.saving_percentage) FROM substitutes s WHERE s.medicine_id = m.id) as generic_savings_pct
                FROM medicines m
                LEFT JOIN compositions c ON m.id = c.medicine_id`;
     const params = [];

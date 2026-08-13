@@ -5,7 +5,7 @@ import {
   Menu, X, Activity, Pill, BookOpen, Stethoscope,
   MapPin, Droplet, HeartHandshake, Newspaper,
   User, Sun, Moon, ShieldAlert, LogOut, Home,
-  ChevronRight, Scan, Bell, Globe, Volume2, VolumeX
+  Scan, Globe, Volume2, VolumeX
 } from 'lucide-react';
 
 export const Navbar = ({ activeTab, setActiveTab }) => {
@@ -23,6 +23,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
     { id: 'blood',   label: t('navBlood'),   icon: Droplet,        badge: 'Live Stock',  color: '#dc2626' },
     { id: 'organ',   label: t('navOrgan'),   icon: HeartHandshake, badge: 'NOTTO',       color: '#0d9488' },
     { id: 'news',    label: t('navNews'),    icon: Newspaper,      badge: 'WHO Feed',    color: '#d97706' },
+    { id: 'ocr',     label: t('navOcr'),     icon: Scan,            badge: 'OCR Scan',    color: '#6366f1' },
     { id: 'profile', label: t('navProfile'), icon: User,           badge: 'Passport',    color: '#4f46e5' },
   ];
 
