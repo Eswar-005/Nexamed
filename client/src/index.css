@@ -2266,3 +2266,185 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 @media (max-width: 768px) {
   .sidebar-drawer { width: 280px; }
 }
+
+/* ══════════════════════════════════════════════
+   PEACEFUL AMBIENT BACKGROUND
+   Soft gradients + drifting glow blobs behind content
+══════════════════════════════════════════════ */
+
+body {
+  background-color: var(--bg-main);
+  background-image:
+    radial-gradient(ellipse 85% 60% at 12% -8%, rgba(2, 132, 199, 0.14), transparent 62%),
+    radial-gradient(ellipse 70% 55% at 108% 18%, rgba(13, 148, 136, 0.12), transparent 58%),
+    radial-gradient(ellipse 65% 60% at 50% 115%, rgba(124, 58, 237, 0.09), transparent 62%);
+  background-attachment: fixed;
+}
+
+html[data-theme='dark'] body {
+  background-image:
+    radial-gradient(ellipse 85% 60% at 12% -8%, rgba(2, 132, 199, 0.20), transparent 62%),
+    radial-gradient(ellipse 70% 55% at 108% 18%, rgba(13, 148, 136, 0.17), transparent 58%),
+    radial-gradient(ellipse 65% 60% at 50% 115%, rgba(124, 58, 237, 0.15), transparent 62%);
+}
+
+/* Fixed decoration layer behind all content */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Soft blurred glow blobs */
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.8;
+  animation: blobDrift 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.blob-1 {
+  width: 480px; height: 480px;
+  top: -140px; left: -130px;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.40), transparent 65%);
+}
+.blob-2 {
+  width: 440px; height: 440px;
+  top: 28%; right: -170px;
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.35), transparent 65%);
+  animation-delay: -9s;
+}
+.blob-3 {
+  width: 540px; height: 540px;
+  bottom: -190px; left: 16%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.26), transparent 65%);
+  animation-delay: -17s;
+}
+.blob-4 {
+  width: 320px; height: 320px;
+  top: 58%; left: -120px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.26), transparent 65%);
+  animation-delay: -5s;
+}
+
+html[data-theme='dark'] .bg-blob { opacity: 0.85; }
+
+/* Subtle dotted grid fading at the top */
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: 0.4;
+  -webkit-mask-image: radial-gradient(ellipse 90% 65% at 50% 0%, #000 20%, transparent 78%);
+  mask-image: radial-gradient(ellipse 90% 65% at 50% 0%, #000 20%, transparent 78%);
+}
+
+html[data-theme='dark'] .bg-grid {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px);
+  opacity: 0.3;
+}
+
+/* Slow shifting aurora sheen across the top */
+.bg-aurora {
+  position: absolute;
+  top: -22%;
+  left: -12%;
+  right: -12%;
+  height: 72%;
+  background: linear-gradient(120deg,
+    rgba(56, 189, 248, 0.10) 0%,
+    rgba(45, 212, 191, 0.08) 28%,
+    transparent 52%,
+    rgba(167, 139, 250, 0.07) 74%,
+    transparent 100%);
+  background-size: 220% 220%;
+  filter: blur(46px);
+  animation: auroraShift 30s ease-in-out infinite alternate;
+  will-change: background-position;
+}
+
+html[data-theme='dark'] .bg-aurora {
+  background: linear-gradient(120deg,
+    rgba(56, 189, 248, 0.16) 0%,
+    rgba(45, 212, 191, 0.12) 28%,
+    transparent 52%,
+    rgba(167, 139, 250, 0.11) 74%,
+    transparent 100%);
+}
+
+/* Soft calm glow rising from the bottom */
+.bg-glow-bottom {
+  position: absolute;
+  bottom: -22%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95%;
+  height: 55%;
+  background: radial-gradient(ellipse, rgba(16, 185, 129, 0.10), transparent 65%);
+  filter: blur(34px);
+  animation: bottomGlow 20s ease-in-out infinite alternate;
+  will-change: opacity, transform;
+}
+
+html[data-theme='dark'] .bg-glow-bottom {
+  background: radial-gradient(ellipse, rgba(16, 185, 129, 0.14), transparent 65%);
+}
+
+/* Gentle rising particles */
+.bg-particles {
+  position: absolute;
+  inset: 0;
+}
+
+.bg-particle {
+  position: absolute;
+  bottom: -18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.9), rgba(125, 211, 252, 0.45) 55%, transparent 72%);
+  box-shadow: 0 0 10px rgba(125, 211, 252, 0.22);
+  opacity: 0;
+  animation-name: particleRise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+html[data-theme='dark'] .bg-particle {
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.9), rgba(45, 212, 191, 0.4) 55%, transparent 72%);
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.22);
+}
+
+@keyframes blobDrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(34px, -28px) scale(1.08); }
+  100% { transform: translate(-24px, 22px) scale(0.94); }
+}
+
+@keyframes auroraShift {
+  0%   { background-position: 0% 40%; }
+  100% { background-position: 100% 60%; }
+}
+
+@keyframes bottomGlow {
+  0%   { opacity: 0.7; transform: translateX(-50%) scaleY(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scaleY(1.08); }
+}
+
+@keyframes particleRise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: var(--po, 0.3); }
+  85%  { opacity: var(--po, 0.3); }
+  100% { transform: translateY(-108vh) translateX(26px); opacity: 0; }
+}
+
+/* Respect reduced-motion preference — keep the view calm */
+@media (prefers-reduced-motion: reduce) {
+  .bg-blob, .bg-aurora, .bg-glow-bottom, .bg-particle {
+    animation: none;
+  }
+}

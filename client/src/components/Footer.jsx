@@ -105,7 +105,6 @@ export const Footer = () => {
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 py-3"
             style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
             <span>{t('footerRights').replace('©', `© ${new Date().getFullYear()}`)}</span>
-            <span>{t('footerStack')}</span>
           </div>
         </div>
       </div>

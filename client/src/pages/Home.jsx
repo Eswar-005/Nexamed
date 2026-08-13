@@ -9,7 +9,7 @@ import {
   CheckCircle2, Mic
 } from 'lucide-react';
 
-export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine }) => {
+export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelectNews }) => {
   const { triggerSOS } = useSOS();
   const { t, language } = useLanguage();
   const [quickQuery, setQuickQuery] = useState('');
@@ -421,11 +421,11 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine }) => {
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>
                       Source: <strong>{news.source}</strong>
                     </span>
-                    <a href={news.url} target="_blank" rel="noreferrer"
-                      className="btn-glass d-flex align-items-center gap-1"
-                      style={{ padding: '4px 10px', fontSize: '0.75rem', color: 'var(--primary-cyan)', textDecoration: 'none' }}>
+                    <button onClick={() => onSelectNews(news)}
+                      className="btn-glass d-flex align-items-center gap-1 border-0"
+                      style={{ padding: '4px 10px', fontSize: '0.75rem', color: 'var(--primary-cyan)', cursor: 'pointer' }}>
                       <span>Read</span><ArrowRight size={13} />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>

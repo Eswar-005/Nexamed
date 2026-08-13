@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { Logo } from './Logo';
 import {
-  Menu, X, Activity, Pill, BookOpen, Stethoscope,
+  Menu, X, Pill, BookOpen, Stethoscope,
   MapPin, Droplet, HeartHandshake, Newspaper,
   User, Sun, Moon, ShieldAlert, LogOut, Home,
   Scan, Globe, Volume2, VolumeX
@@ -63,9 +64,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             </button>
 
             <div className="nexamed-brand d-flex align-items-center gap-2" onClick={() => setActiveTab('home')} style={{ cursor: 'pointer' }}>
-              <div className="brand-logo-circle animate-heartbeat">
-                <Activity size={20} />
-              </div>
+              <Logo size={40} />
               <div className="d-none d-sm-block">
                 <div className="fw-black gradient-text" style={{ fontFamily: 'Outfit', fontSize: '1.25rem', fontWeight: 900, lineHeight: 1.1 }}>
                   NEXAMED
@@ -234,9 +233,7 @@ export const Navbar = ({ activeTab, setActiveTab }) => {
             {/* Sidebar Header */}
             <div className="d-flex align-items-center justify-content-between mb-4 pb-3" style={{ borderBottom: '1px solid var(--border-card)' }}>
               <div className="d-flex align-items-center gap-2">
-                <div className="brand-logo-circle" style={{ width: '38px', height: '38px', borderRadius: '10px' }}>
-                  <Activity size={18} />
-                </div>
+                <Logo size={36} />
                 <div>
                   <div className="fw-bold gradient-text" style={{ fontFamily: 'Outfit', fontSize: '1.05rem' }}>NEXAMED</div>
                   <div style={{ fontSize: '0.6rem', color: 'var(--text-dim)', letterSpacing: '1.5px', fontWeight: 700 }}>{t('allModules').toUpperCase()}</div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Newspaper, ExternalLink, Award, Sparkles, Calendar, AlertTriangle, Filter, Globe, Zap, Search, RefreshCw, TrendingUp, BookOpen, Heart, Shield, FlaskConical, Pill, Clock, Bookmark } from 'lucide-react';
+import { Newspaper, Award, Sparkles, Calendar, AlertTriangle, Filter, Globe, Zap, Search, RefreshCw, TrendingUp, BookOpen, Heart, Shield, FlaskConical, Pill, Clock, Bookmark, ChevronRight } from 'lucide-react';
 
 const CATEGORIES = [
   { id: 'all',              label: 'All News',       icon: Newspaper,      color: '#0284c7', bg: '#0284c718' },
@@ -32,7 +32,7 @@ const getSourceStyle = (src) => SOURCE_COLORS[src] || { bg: '#d9770618', color: 
 
 const estimateReadTime = (text = '') => Math.max(1, Math.round(text.split(' ').length / 200));
 
-export const HealthNews = () => {
+export const HealthNews = ({ onSelectNews }) => {
   const [allNews, setAllNews] = useState([]);
   const [filteredNews, setFilteredNews] = useState([]);
   const [dailyTip, setDailyTip] = useState(null);
@@ -338,11 +338,11 @@ export const HealthNews = () => {
                         <Clock size={12} /> {estimateReadTime(featuredNews.summary)} min read
                       </div>
                     </div>
-                    <a href={featuredNews.url} target="_blank" rel="noreferrer"
-                      className="btn-gradient text-decoration-none"
-                      style={{ fontSize: '0.82rem', borderRadius: 'var(--radius-md)', padding: '9px 18px' }}>
-                      <ExternalLink size={14} /> Read Official Bulletin
-                    </a>
+                    <button onClick={() => onSelectNews(featuredNews)}
+                      className="btn-gradient border-0 d-flex align-items-center gap-2"
+                      style={{ fontSize: '0.82rem', borderRadius: 'var(--radius-md)', padding: '9px 18px', cursor: 'pointer' }}>
+                      Read Details <ChevronRight size={14} />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -414,17 +414,17 @@ export const HealthNews = () => {
                     </div>
 
                     <div className="px-4 pb-4">
-                      <a href={item.url} target="_blank" rel="noreferrer"
-                        className="d-flex align-items-center justify-content-center gap-2 text-decoration-none w-100 py-2 rounded-3"
+                      <button onClick={() => onSelectNews(item)}
+                        className="d-flex align-items-center justify-content-center gap-2 w-100 py-2 rounded-3 border-0"
                         style={{
                           background: 'var(--bg-input)', border: `1px solid ${sc.border}`,
-                          color: sc.color, fontSize: '0.82rem', fontWeight: 700, transition: 'all 0.2s'
+                          color: sc.color, fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s'
                         }}
                         onMouseEnter={(e) => { e.currentTarget.style.background = sc.bg; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-input)'; }}>
-                        <span>Read Official Bulletin</span>
-                        <ExternalLink size={13} />
-                      </a>
+                        <span>Read Details</span>
+                        <ChevronRight size={13} />
+                      </button>
                     </div>
                   </div>
                 </div>
