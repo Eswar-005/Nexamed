@@ -34,6 +34,38 @@ export const TabletCard = ({ med, onSelect }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Tablet picture */}
+      <div className="d-flex align-items-center justify-content-center mb-3 rounded-3"
+        style={{
+          height: '120px', background: 'rgba(255,255,255,0.95)',
+          border: '1px solid var(--border-glass)', overflow: 'hidden',
+          position: 'relative', transition: 'transform 0.25s ease',
+          transform: hovered ? 'scale(1.015)' : 'scale(1)'
+        }}>
+        {med.image_url && !imgError ? (
+          <img src={med.image_url} alt={med.name} loading="lazy"
+            onError={() => setImgError(true)}
+            style={{ height: '100%', width: '100%', objectFit: 'contain', padding: '6px' }} />
+        ) : (
+          <div className="d-flex flex-column align-items-center justify-content-center gap-2" style={{ color: catStyle.color }}>
+            <div style={{
+              width: '52px', height: '52px', borderRadius: '14px',
+              background: catStyle.bg, display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <Pill size={26} />
+            </div>
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-dim)' }}>Packet Image Unavailable</span>
+          </div>
+        )}
+        <span style={{
+          position: 'absolute', top: '8px', right: '8px',
+          fontSize: '0.6rem', fontWeight: 800, padding: '3px 8px', borderRadius: '6px',
+          background: 'rgba(5,150,105,0.12)', color: '#059669', border: '1px solid rgba(5,150,105,0.25)'
+        }}>
+          TABLET
+        </span>
+      </div>
+
       {/* Header row */}
       <div className="d-flex align-items-center justify-content-between mb-3 pb-3"
         style={{ borderBottom: '1px solid var(--border-card)' }}>
@@ -45,13 +77,7 @@ export const TabletCard = ({ med, onSelect }) => {
             flexShrink: 0, overflow: 'hidden', transition: 'transform 0.25s ease',
             transform: hovered ? 'scale(1.12) rotate(-5deg)' : 'scale(1)'
           }}>
-            {med.image_url && !imgError ? (
-              <img src={med.image_url} alt={med.name} loading="lazy"
-                onError={() => setImgError(true)}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <Pill size={19} />
-            )}
+            <Pill size={19} />
           </div>
           <div>
             <div style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-dim)', letterSpacing: '0.05em' }}>FORMULATION</div>

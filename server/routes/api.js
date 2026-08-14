@@ -595,7 +595,8 @@ router.get('/news', async (req, res) => {
         category: 'Global Alert',
         date: '2026-08-05',
         url: 'https://www.who.int',
-        urgent: true
+        urgent: true,
+        image_url: '/images/news/who-influenza-alert.png',
       },
       {
         id: 2,
@@ -606,7 +607,8 @@ router.get('/news', async (req, res) => {
         category: 'Blood Donation',
         date: '2026-08-04',
         url: 'https://eraktkosh.mohfw.gov.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/eraktkosh-blood.jpg',
       },
       {
         id: 3,
@@ -617,7 +619,8 @@ router.get('/news', async (req, res) => {
         category: 'Pharma Policy',
         date: '2026-08-02',
         url: 'https://pib.gov.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/jan-aushadhi-generics.jpg',
       },
       {
         id: 4,
@@ -628,7 +631,8 @@ router.get('/news', async (req, res) => {
         category: 'Organ Donation',
         date: '2026-08-01',
         url: 'https://notto.mohfw.gov.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/notto-organ-donation.jpg',
       },
       {
         id: 5,
@@ -639,7 +643,8 @@ router.get('/news', async (req, res) => {
         category: 'Clinical Guidelines',
         date: '2026-07-30',
         url: 'https://icmr.gov.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/icmr-diabetes.jpg',
       },
       {
         id: 6,
@@ -650,7 +655,8 @@ router.get('/news', async (req, res) => {
         category: 'Outbreak Alert',
         date: '2026-07-28',
         url: 'https://health.ap.gov.in',
-        urgent: true
+        urgent: true,
+        image_url: '/images/news/dengue-outbreak.jpg',
       },
       {
         id: 7,
@@ -661,7 +667,8 @@ router.get('/news', async (req, res) => {
         category: 'Insurance Policy',
         date: '2026-07-25',
         url: 'https://pmjay.gov.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/ayushman-senior-coverage.jpg',
       },
       {
         id: 8,
@@ -672,7 +679,8 @@ router.get('/news', async (req, res) => {
         category: 'Global Alert',
         date: '2026-07-22',
         url: 'https://www.who.int/malaria',
-        urgent: true
+        urgent: true,
+        image_url: '/images/news/who-malaria-act.png',
       },
       {
         id: 9,
@@ -683,7 +691,8 @@ router.get('/news', async (req, res) => {
         category: 'Mental Health',
         date: '2026-07-18',
         url: 'https://nimhans.ac.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/tele-manas-mental-health.jpg',
       },
       {
         id: 10,
@@ -694,7 +703,8 @@ router.get('/news', async (req, res) => {
         category: 'Vaccines',
         date: '2026-07-15',
         url: 'https://cdsco.gov.in',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/gennova-mrna-vaccine.jpg',
       },
       {
         id: 11,
@@ -705,7 +715,8 @@ router.get('/news', async (req, res) => {
         category: 'Digital Health',
         date: '2026-07-10',
         url: 'https://aiims.edu',
-        urgent: false
+        urgent: false,
+        image_url: '/images/news/aiims-retinopathy.jpg',
       },
       {
         id: 12,
@@ -716,7 +727,8 @@ router.get('/news', async (req, res) => {
         category: 'Antimicrobial',
         date: '2026-07-07',
         url: 'https://icmr.gov.in/amr',
-        urgent: true
+        urgent: true,
+        image_url: '/images/news/icmr-antibiotic-resistance.jpg',
       }
     ];
 

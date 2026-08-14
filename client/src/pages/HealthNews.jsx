@@ -290,15 +290,20 @@ export const HealthNews = ({ onSelectNews }) => {
             <div className="news-featured-card mb-4">
               <div className="row g-0 align-items-stretch">
                 <div className="col-md-3 d-flex align-items-center justify-content-center p-4"
-                  style={{ background: 'linear-gradient(135deg, rgba(2,132,199,0.12), rgba(13,148,136,0.08))', minHeight: '180px' }}>
-                  <div style={{
-                    width: '100px', height: '100px', borderRadius: '24px',
-                    background: 'var(--primary-gradient)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: '0 8px 30px rgba(2,132,199,0.3)'
-                  }}>
-                    <Newspaper size={44} color="#fff" />
-                  </div>
+                  style={{ background: 'linear-gradient(135deg, rgba(2,132,199,0.12), rgba(13,148,136,0.08))', minHeight: '180px', overflow: 'hidden' }}>
+                  {featuredNews.image_url ? (
+                    <img src={featuredNews.image_url} alt={featuredNews.title} loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', position: 'relative' }} />
+                  ) : (
+                    <div style={{
+                      width: '100px', height: '100px', borderRadius: '24px',
+                      background: 'var(--primary-gradient)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: '0 8px 30px rgba(2,132,199,0.3)'
+                    }}>
+                      <Newspaper size={44} color="#fff" />
+                    </div>
+                  )}
                 </div>
                 <div className="col-md-9 p-4 d-flex flex-column justify-content-between">
                   <div>
@@ -356,16 +361,24 @@ export const HealthNews = ({ onSelectNews }) => {
               const catInfo = CATEGORIES.find((c) => c.id === item.category);
               const isBookmarked = bookmarks.has(item.id);
               return (
-                <div key={item.id} className="col-md-6 col-lg-4 animate-fade-up"
-                  style={{ animationDelay: `${idx * 0.05}s` }}>
-                  <div className="card-premium h-100 d-flex flex-column justify-content-between"
-                    style={item.urgent ? { boxShadow: '0 0 0 1px rgba(220,38,38,0.15), var(--shadow-md)' } : {}}>
+                  <div key={item.id} className="col-md-6 col-lg-4 animate-fade-up"
+                    style={{ animationDelay: `${idx * 0.05}s` }}>
+                    <div className="card-premium h-100 d-flex flex-column justify-content-between"
+                      style={item.urgent ? { boxShadow: '0 0 0 1px rgba(220,38,38,0.15), var(--shadow-md)' } : {}}>
 
-                    {item.urgent && (
-                      <div style={{ height: '3px', background: 'linear-gradient(90deg,#ef4444,#dc2626)', borderRadius: '16px 16px 0 0' }} />
-                    )}
+                      {item.urgent && (
+                        <div style={{ height: '3px', background: 'linear-gradient(90deg,#ef4444,#dc2626)', borderRadius: '16px 16px 0 0' }} />
+                      )}
 
-                    <div className="p-4 flex-grow-1 d-flex flex-column">
+                      {item.image_url && (
+                        <div className="mx-4 mt-4 d-flex align-items-center justify-content-center rounded-3"
+                          style={{ height: '130px', background: 'rgba(255,255,255,0.95)', border: '1px solid var(--border-glass)', overflow: 'hidden' }}>
+                          <img src={item.image_url} alt={item.title} loading="lazy"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+
+                      <div className="p-4 flex-grow-1 d-flex flex-column">
                       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-1">
                         <span style={{
                           fontSize: '0.67rem', fontWeight: 800, padding: '4px 10px', borderRadius: '999px',

@@ -15,18 +15,30 @@ export const NewsDetailModal = ({ news, onClose }) => {
         {/* Modal Header — same layout as medicine details */}
         <div className="p-4 pb-3 d-flex justify-content-between align-items-start"
           style={{ borderBottom: '1px solid var(--border-card)', background: 'linear-gradient(135deg,#d97706,#f59e0b)', borderRadius: '16px 16px 0 0' }}>
-          <div>
-            <span style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '3px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.04em' }}>
-              {news.category || 'Bulletin'}
-            </span>
-            <h3 className="fw-bold mt-2 mb-0" style={{ fontFamily: 'Outfit', color: '#fff', fontSize: '1.4rem', lineHeight: 1.3 }}>
-              {news.title}
-            </h3>
-            <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.8)', display: 'inline-flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
-              <span className="d-inline-flex align-items-center gap-1"><Globe size={12} /> {news.source}</span>
-              <span className="d-inline-flex align-items-center gap-1"><Calendar size={12} /> {news.date}</span>
-              <span className="d-inline-flex align-items-center gap-1"><Clock size={12} /> {estimateReadTime(news.detail || news.summary)} min read</span>
-            </span>
+          <div className="d-flex align-items-center gap-3">
+            {news.image_url && (
+              <div style={{
+                width: '80px', height: '80px', borderRadius: '16px', overflow: 'hidden', flexShrink: 0,
+                background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(255,255,255,0.4)',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <img src={news.image_url} alt={news.title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            )}
+            <div>
+              <span style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '3px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.04em' }}>
+                {news.category || 'Bulletin'}
+              </span>
+              <h3 className="fw-bold mt-2 mb-0" style={{ fontFamily: 'Outfit', color: '#fff', fontSize: '1.4rem', lineHeight: 1.3 }}>
+                {news.title}
+              </h3>
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.8)', display: 'inline-flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
+                <span className="d-inline-flex align-items-center gap-1"><Globe size={12} /> {news.source}</span>
+                <span className="d-inline-flex align-items-center gap-1"><Calendar size={12} /> {news.date}</span>
+                <span className="d-inline-flex align-items-center gap-1"><Clock size={12} /> {estimateReadTime(news.detail || news.summary)} min read</span>
+              </span>
+            </div>
           </div>
           <button className="btn-glass rounded-circle d-flex align-items-center justify-content-center"
             style={{ width: '38px', height: '38px', padding: 0, flexShrink: 0, background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }}

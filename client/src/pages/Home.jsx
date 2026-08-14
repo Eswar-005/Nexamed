@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSOS } from '../context/SOSContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
-  Search, Pill, BookOpen, Stethoscope,
+  Search, Pill, Stethoscope,
   MapPin, Droplet, HeartHandshake, ShieldAlert,
   Newspaper, ChevronRight, Sparkles, PhoneCall,
   Flame, Clock, Zap, Building2, Activity, ArrowRight,
@@ -72,13 +72,6 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
     { text: 'Pantocid 40', bg: 'linear-gradient(135deg,#d97706,#f59e0b)', tab: 'pharma' },
     { text: 'Azithral 500', bg: 'linear-gradient(135deg,#7c3aed,#8b5cf6)', tab: 'pharma' },
     { text: 'Dengue Fever', bg: 'linear-gradient(135deg,#e11d48,#f43f5e)', tab: 'disease' },
-  ];
-
-  const statsRow = [
-    { label: 'Medicines',    value: '500+',   icon: Pill,           color: '#0284c7', bg: '#0284c718' },
-    { label: 'Diseases',     value: '80+',    icon: BookOpen,       color: '#7c3aed', bg: '#7c3aed18' },
-    { label: 'Pharmacies',   value: '120+',   icon: MapPin,         color: '#059669', bg: '#05966918' },
-    { label: 'Blood Banks',  value: '40+',    icon: Droplet,        color: '#dc2626', bg: '#dc262618' },
   ];
 
   return (
@@ -222,28 +215,6 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
         </div>
       </div>
 
-      {/* ── STATS ROW ── */}
-      <div className="row g-3 mb-4">
-        {statsRow.map((s) => {
-          const Icon = s.icon;
-          return (
-            <div key={s.label} className="col-6 col-md-3">
-              <div className="stat-card">
-                <div className="stat-icon" style={{ background: s.bg, color: s.color }}>
-                  <Icon size={20} />
-                </div>
-                <div>
-                  <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.4rem', color: 'var(--text-main)', lineHeight: 1 }}>
-                    {s.value}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600 }}>{s.label}</div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
       {/* ── TOP PRESCRIBED MEDICINES CAROUSEL ── */}
       {bestsellerMeds.length > 0 && (
         <div className="mb-4">
@@ -267,11 +238,14 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
           <div className="d-flex gap-3 pb-3 custom-horizontal-scroll" style={{ overflowX: 'auto', scrollSnapType: 'x mandatory' }}>
             {bestsellerMeds.map((med) => (
               <div key={med.id} className="glass-card p-3 flex-shrink-0 d-flex flex-column justify-content-between"
-                style={{ width: '230px', scrollSnapAlign: 'start', minHeight: '180px' }}>
+                style={{ width: '230px', scrollSnapAlign: 'start', minHeight: '180px', cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease' }}
+                onClick={() => onSelectMedicine(med.id)}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(2,132,199,0.18)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div>
                   {med.image_url && (
                     <div className="d-flex align-items-center justify-content-center mb-2 rounded-3"
-                      style={{ height: '90px', background: 'var(--bg-input)', border: '1px solid var(--border-glass)', overflow: 'hidden' }}>
+                      style={{ height: '110px', background: 'rgba(255,255,255,0.95)', border: '1px solid var(--border-glass)', overflow: 'hidden' }}>
                       <img src={med.image_url} alt={med.name} loading="lazy"
                         style={{ height: '100%', objectFit: 'contain', maxWidth: '100%' }} />
                     </div>
@@ -293,9 +267,9 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
                       ₹{med.mrp.toFixed(2)}
                     </span>
                   </div>
-                  <button className="btn-gradient w-100 d-flex align-items-center justify-content-center gap-1 py-2"
+                  <button type="button" className="btn-gradient w-100 d-flex align-items-center justify-content-center gap-1 py-2"
                     style={{ fontSize: '0.78rem', borderRadius: 'var(--radius-sm)' }}
-                    onClick={() => onSelectMedicine(med.id)}>
+                    onClick={(e) => { e.stopPropagation(); onSelectMedicine(med.id); }}>
                     <Pill size={13} /><span>View Details</span>
                   </button>
                 </div>
@@ -413,6 +387,13 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
             {newsFeed.slice(0, 3).map((news) => (
               <div key={news.id} className="col-md-4">
                 <div className="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                  {news.image_url && (
+                    <div className="d-flex align-items-center justify-content-center mb-3 rounded-3"
+                      style={{ height: '120px', background: 'rgba(255,255,255,0.95)', border: '1px solid var(--border-glass)', overflow: 'hidden' }}>
+                      <img src={news.image_url} alt={news.title} loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  )}
                   <div>
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <span className="badge-cyan" style={{ fontSize: '0.65rem' }}>NEXAMED PULSE</span>

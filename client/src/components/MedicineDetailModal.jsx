@@ -35,12 +35,12 @@ export const MedicineDetailModal = ({ selectedMed, medDetails, onClose }) => {
           <div className="d-flex align-items-center gap-3">
             {selectedMed.image_url && (
               <div style={{
-                width: '64px', height: '64px', borderRadius: '14px', overflow: 'hidden', flexShrink: 0,
-                background: 'rgba(255,255,255,0.95)', border: '1px solid rgba(255,255,255,0.4)',
+                width: '80px', height: '80px', borderRadius: '16px', overflow: 'hidden', flexShrink: 0,
+                background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(255,255,255,0.4)',
                 boxShadow: '0 4px 14px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
                 <img src={selectedMed.image_url} alt={selectedMed.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
               </div>
             )}
             <div>
