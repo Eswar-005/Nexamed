@@ -269,6 +269,13 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
               <div key={med.id} className="glass-card p-3 flex-shrink-0 d-flex flex-column justify-content-between"
                 style={{ width: '230px', scrollSnapAlign: 'start', minHeight: '180px' }}>
                 <div>
+                  {med.image_url && (
+                    <div className="d-flex align-items-center justify-content-center mb-2 rounded-3"
+                      style={{ height: '90px', background: 'var(--bg-input)', border: '1px solid var(--border-glass)', overflow: 'hidden' }}>
+                      <img src={med.image_url} alt={med.name} loading="lazy"
+                        style={{ height: '100%', objectFit: 'contain', maxWidth: '100%' }} />
+                    </div>
+                  )}
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <span className="badge-warning" style={{ fontSize: '0.64rem' }}>MOST PRESCRIBED</span>
                     <span className="badge-teal" style={{ fontSize: '0.64rem' }}>Generic ✓</span>

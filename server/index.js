@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import apiRoutes from './routes/api.js';
-import { seedDatabase } from './seed.js';
+import { seedDatabase, backfillMedicineImages } from './seed.js';
 import { getQuery } from './db.js';
 
 dotenv.config();
@@ -36,6 +36,9 @@ const startServer = async () => {
       console.log('Initializing & seeding database...');
       await seedDatabase();
     }
+
+    // Idempotent: keep medicine packet images up to date on existing databases
+    await backfillMedicineImages();
 
     app.listen(PORT, () => {
       console.log(`====================================================`);

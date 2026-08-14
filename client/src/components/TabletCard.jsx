@@ -3,6 +3,7 @@ import { Pill, Building2, ChevronRight, Leaf, Tag } from 'lucide-react';
 
 export const TabletCard = ({ med, onSelect }) => {
   const [hovered, setHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const getCategoryStyle = (cat = '') => {
     const c = cat.toLowerCase();
@@ -41,10 +42,16 @@ export const TabletCard = ({ med, onSelect }) => {
             width: '40px', height: '40px', borderRadius: '12px',
             background: catStyle.bg, color: catStyle.color,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, transition: 'transform 0.25s ease',
+            flexShrink: 0, overflow: 'hidden', transition: 'transform 0.25s ease',
             transform: hovered ? 'scale(1.12) rotate(-5deg)' : 'scale(1)'
           }}>
-            <Pill size={19} />
+            {med.image_url && !imgError ? (
+              <img src={med.image_url} alt={med.name} loading="lazy"
+                onError={() => setImgError(true)}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <Pill size={19} />
+            )}
           </div>
           <div>
             <div style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-dim)', letterSpacing: '0.05em' }}>FORMULATION</div>

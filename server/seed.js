@@ -1,6 +1,26 @@
 import bcrypt from 'bcryptjs';
 import db, { initTables, runQuery, getQuery, allQuery } from './db.js';
 
+export const MEDICINE_IMAGES = {
+  'Dolo 650 Tablet': 'dolo-650.jpg',
+  'Crocin 650 Advance': 'crocin-650-advance.png',
+  'Paracip 650 Tablet': 'paracip-650.png',
+  'Disprin 325mg Effervescent': 'disprin-325.png',
+  'Pantocid 40 Tablet': 'pantocid-40.png',
+  'Pan 40 Tablet': 'pan-40.jpg',
+  'Panto-D Capsule': 'panto-d.png',
+  'Azithral 500 Tablet': 'azithral-500.jpg',
+  'Azee 500 Tablet': 'azee-500.png',
+  'Glycomet 500 Tablet': 'glycomet-500.png',
+  'Metformin 500 Generic': 'metformin-500-generic.jpg',
+  'Combiflam Tablet': 'combiflam.jpg',
+  'Telma 40 Tablet': 'telma-40.png',
+  'Allegra 120mg Tablet': 'allegra-120.png',
+  'Augmentin 625 DUO Tablet': 'augmentin-625-duo.jpg',
+  'Evion 400 Capsule': 'evion-400.png',
+  'Vitamin E 400 Generic Capsule': 'vitamin-e-400-generic.jpg'
+};
+
 export const seedDatabase = async () => {
   console.log('Seeding database...');
   await initTables();
@@ -394,8 +414,8 @@ export const seedDatabase = async () => {
   const medIdMap = {};
   for (const m of medsData) {
     const res = await runQuery(
-      `INSERT INTO medicines (name, generic_name, manufacturer, mrp, pack_size, category, prescription_required, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [m.name, m.generic_name, m.manufacturer, m.mrp, m.pack_size, m.category, m.prescription_required, m.description]
+      `INSERT INTO medicines (name, generic_name, manufacturer, mrp, pack_size, category, prescription_required, description, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [m.name, m.generic_name, m.manufacturer, m.mrp, m.pack_size, m.category, m.prescription_required, m.description, `/images/medicines/${MEDICINE_IMAGES[m.name] || ''}`]
     );
     const medId = res.lastID;
     medIdMap[m.name] = medId;
@@ -847,6 +867,17 @@ export const seedDatabase = async () => {
   }
 
   console.log('Database seeded successfully with rich realistic datasets!');
+  await backfillMedicineImages();
+};
+
+// Idempotent backfill of medicine packet images (safe to run on existing databases)
+export const backfillMedicineImages = async () => {
+  let updated = 0;
+  for (const [name, file] of Object.entries(MEDICINE_IMAGES)) {
+    const res = await runQuery(`UPDATE medicines SET image_url = ? WHERE name = ? AND (image_url IS NULL OR image_url = '')`, [`/images/medicines/${file}`, name]);
+    if (res.changes) updated += res.changes;
+  }
+  if (updated > 0) console.log(`Backfilled medicine images for ${updated} medicines.`);
 };
 
 // Execute if run directly

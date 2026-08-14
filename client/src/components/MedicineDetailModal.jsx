@@ -32,16 +32,28 @@ export const MedicineDetailModal = ({ selectedMed, medDetails, onClose }) => {
         {/* Modal Header */}
         <div className="p-4 pb-3 d-flex justify-content-between align-items-start"
           style={{ borderBottom: '1px solid var(--border-card)', background: 'var(--primary-gradient)', borderRadius: '16px 16px 0 0' }}>
-          <div>
-            <span style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '3px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.04em' }}>
-              {selectedMed.category}
-            </span>
-            <h3 className="fw-bold mt-2 mb-0" style={{ fontFamily: 'Outfit', color: '#fff', fontSize: '1.4rem' }}>
-              {selectedMed.name}
-            </h3>
-            <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.8)' }}>
-              {selectedMed.manufacturer} · {selectedMed.pack_size}
-            </span>
+          <div className="d-flex align-items-center gap-3">
+            {selectedMed.image_url && (
+              <div style={{
+                width: '64px', height: '64px', borderRadius: '14px', overflow: 'hidden', flexShrink: 0,
+                background: 'rgba(255,255,255,0.95)', border: '1px solid rgba(255,255,255,0.4)',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <img src={selectedMed.image_url} alt={selectedMed.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            )}
+            <div>
+              <span style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '3px 10px', borderRadius: '999px', fontWeight: 700, letterSpacing: '0.04em' }}>
+                {selectedMed.category}
+              </span>
+              <h3 className="fw-bold mt-2 mb-0" style={{ fontFamily: 'Outfit', color: '#fff', fontSize: '1.4rem' }}>
+                {selectedMed.name}
+              </h3>
+              <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.8)' }}>
+                {selectedMed.manufacturer} · {selectedMed.pack_size}
+              </span>
+            </div>
           </div>
           <button className="btn-glass rounded-circle d-flex align-items-center justify-content-center"
             style={{ width: '38px', height: '38px', padding: 0, flexShrink: 0, background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }}
