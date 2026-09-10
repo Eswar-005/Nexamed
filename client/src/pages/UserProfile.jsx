@@ -55,31 +55,6 @@ export const UserProfile = () => {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setIsRegister(false);
-    setEmail('demo@nexamed.com');
-    setPassword('password123');
-    setAuthError('');
-    setAuthLoading(true);
-    try {
-      const res = await apiFetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'demo@nexamed.com', password: 'password123' })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setAuthError(data.error || 'Demo login failed');
-      } else if (data.token) {
-        login(data.token, data.user);
-      }
-    } catch {
-      setAuthError('Connection error. Ensure the backend server is running.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
   const addAllergy = async (e) => {
     e.preventDefault();
     if (!allergenInput) return;
@@ -213,10 +188,6 @@ export const UserProfile = () => {
             </form>
 
             <div className="d-flex flex-column gap-2 pt-3" style={{ borderTop: '1px solid var(--border-card)' }}>
-              <button className="btn-glass w-100 py-2 d-flex align-items-center justify-content-center gap-2" onClick={handleDemoLogin}
-                style={{ fontSize: '0.85rem', color: 'var(--primary-cyan)', borderColor: 'rgba(2,132,199,0.3)' }}>
-                🚀 Quick Demo Login (Rahul Sharma)
-              </button>
               <button className="border-0 bg-transparent p-0 text-center w-100"
                 style={{ fontSize: '0.83rem', color: 'var(--text-dim)', cursor: 'pointer' }}
                 onClick={() => setIsRegister(!isRegister)}>
