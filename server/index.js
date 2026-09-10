@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import apiRoutes from './routes/api.js';
 import { seedDatabase, backfillMedicineImages } from './seed.js';
-import { getQuery } from './db.js';
+import { connectDB, models } from './db.js';
 
 dotenv.config();
 
@@ -23,27 +23,34 @@ app.get('/health', (req, res) => {
 
 const startServer = async () => {
   try {
-    // Check if seeded
-    try {
-      const user = await getQuery(`SELECT id FROM users LIMIT 1`);
-      if (!user) {
-        console.log('No user data found. Auto-seeding database...');
+    // Connect to MongoDB
+    const dbConnected = await connectDB();
+
+    if (dbConnected) {
+      // Check if seeded
+      try {
+        const user = await models.User.findOne().lean();
+        if (!user) {
+          console.log('No user data found. Auto-seeding database...');
+          await seedDatabase();
+        } else {
+          console.log('Database already initialized and populated.');
+        }
+      } catch (e) {
+        console.log('Initializing & seeding database...');
         await seedDatabase();
-      } else {
-        console.log('Database already initialized and populated.');
       }
-    } catch (e) {
-      console.log('Initializing & seeding database...');
-      await seedDatabase();
+
+      // Idempotent: keep medicine packet images up to date on existing databases
+      await backfillMedicineImages();
+    } else {
+      console.warn('⚠️ WARNING: MongoDB not connected. Please set process.env.MONGODB_URI in your host dashboard (e.g. MongoDB Atlas Connection URI).');
     }
 
-    // Idempotent: keep medicine packet images up to date on existing databases
-    await backfillMedicineImages();
-
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`====================================================`);
       console.log(`  🏥 NEXAMED HEALTHCARE BACKEND SERVER ONLINE       `);
-      console.log(`  Listening on: http://localhost:${PORT}             `);
+      console.log(`  Listening on port: ${PORT}                          `);
       console.log(`====================================================`);
     });
   } catch (err) {

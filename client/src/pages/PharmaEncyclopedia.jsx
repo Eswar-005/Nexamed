@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TabletCard } from '../components/TabletCard';
 import { Search, Pill, X } from 'lucide-react';
+import { apiFetch } from '../api';
 
 export const PharmaEncyclopedia = ({ initialQuery, onSelectMedicine }) => {
   const [query, setQuery] = useState(initialQuery || '');
@@ -9,7 +10,7 @@ export const PharmaEncyclopedia = ({ initialQuery, onSelectMedicine }) => {
 
   const fetchMedicines = (searchQuery = '') => {
     setLoading(true);
-    fetch(`/api/medicines?q=${encodeURIComponent(searchQuery)}`)
+    apiFetch(`/api/medicines?q=${encodeURIComponent(searchQuery)}`)
       .then((res) => res.json())
       .then((data) => { setMedicines(data || []); setLoading(false); })
       .catch(() => setLoading(false));

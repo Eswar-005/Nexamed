@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { apiFetch } from '../api';
 import {
   Stethoscope, Activity, CheckSquare, Square,
   AlertTriangle, RefreshCw,
@@ -57,7 +58,7 @@ export const SymptomChecker = () => {
   const [customText,         setCustomText]         = useState('');
 
   useEffect(() => {
-    fetch('/api/symptoms')
+    apiFetch('/api/symptoms')
       .then((res) => res.json())
       .then((data) => {
         setGroupedSymptoms(data || {});
@@ -83,7 +84,7 @@ export const SymptomChecker = () => {
     }
     setLoading(true);
     setErrorMsg('');
-    fetch('/api/symptom-checker/analyze', {
+    apiFetch('/api/symptom-checker/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symptomIds: selectedSymptomIds, customText })

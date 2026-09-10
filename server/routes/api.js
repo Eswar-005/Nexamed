@@ -1,10 +1,17 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { runQuery, getQuery, allQuery } from '../db.js';
+import { models } from '../db.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'nexamed_secret_jwt_key_2026';
+
+const {
+  User, UserProfile, UserAllergy, MedicalHistory, EmergencyContact, MedicalReport,
+  Medicine, Composition, SideEffect, Substitute,
+  Disease, Symptom, DiseaseSymptom, DiseaseDiet, DiseasePrecaution, DiseaseMedicine,
+  MedicalStore, StoreInventory, BloodBank, BloodStock, OrganBank, SOSEvent, HealthTip
+} = models;
 
 // Middleware for auth
 const authMiddleware = (req, res, next) => {
@@ -27,32 +34,28 @@ router.post('/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Name, email, and password are required' });
     }
 
-    const existing = await getQuery(`SELECT id FROM users WHERE email = ?`, [email]);
+    const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ error: 'An account with this email already exists' });
     }
 
     const hash = await bcrypt.hash(password, 10);
-    const userRes = await runQuery(
-      `INSERT INTO users (name, email, phone, password_hash) VALUES (?, ?, ?, ?)`,
-      [name, email, phone || '', hash]
-    );
-    const userId = userRes.lastID;
+    const user = await User.create({ name, email, phone: phone || '', password_hash: hash, role: 'patient' });
+    const userId = user._id;
 
     // Profile
-    await runQuery(
-      `INSERT INTO user_profiles (user_id, blood_group) VALUES (?, ?)`,
-      [userId, bloodGroup || 'O+']
-    );
+    await UserProfile.create({ user_id: userId, blood_group: bloodGroup || 'O+' });
 
     // Allergies
     if (Array.isArray(allergies)) {
       for (const a of allergies) {
         if (a.allergen) {
-          await runQuery(
-            `INSERT INTO user_allergies (user_id, allergen, severity, reaction) VALUES (?, ?, ?, ?)`,
-            [userId, a.allergen, a.severity || 'moderate', a.reaction || '']
-          );
+          await UserAllergy.create({
+            user_id: userId,
+            allergen: a.allergen,
+            severity: a.severity || 'moderate',
+            reaction: a.reaction || ''
+          });
         }
       }
     }
@@ -61,10 +64,12 @@ router.post('/auth/register', async (req, res) => {
     if (Array.isArray(medicalHistory)) {
       for (const mh of medicalHistory) {
         if (mh.condition) {
-          await runQuery(
-            `INSERT INTO medical_history (user_id, condition_name, diagnosed_year, notes) VALUES (?, ?, ?, ?)`,
-            [userId, mh.condition, mh.year || 2023, mh.notes || '']
-          );
+          await MedicalHistory.create({
+            user_id: userId,
+            condition_name: mh.condition,
+            diagnosed_year: mh.year || 2023,
+            notes: mh.notes || ''
+          });
         }
       }
     }
@@ -73,10 +78,13 @@ router.post('/auth/register', async (req, res) => {
     if (Array.isArray(emergencyContacts)) {
       for (const ec of emergencyContacts) {
         if (ec.name && ec.phone) {
-          await runQuery(
-            `INSERT INTO emergency_contacts (user_id, name, phone, relationship, priority) VALUES (?, ?, ?, ?, ?)`,
-            [userId, ec.name, ec.phone, ec.relationship || 'Relative', 1]
-          );
+          await EmergencyContact.create({
+            user_id: userId,
+            name: ec.name,
+            phone: ec.phone,
+            relationship: ec.relationship || 'Relative',
+            priority: ec.priority || 1
+          });
         }
       }
     }
@@ -92,14 +100,14 @@ router.post('/auth/register', async (req, res) => {
 router.post('/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await getQuery(`SELECT * FROM users WHERE email = ?`, [email]);
+    const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ error: 'Invalid email or password' });
 
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(400).json({ error: 'Invalid email or password' });
 
-    const token = jwt.sign({ id: user.id, email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role } });
+    const token = jwt.sign({ id: user._id, email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role } });
   } catch (err) {
     res.status(500).json({ error: 'Login failed' });
   }
@@ -108,12 +116,12 @@ router.post('/auth/login', async (req, res) => {
 router.get('/user/profile', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await getQuery(`SELECT id, name, email, phone, role, created_at FROM users WHERE id = ?`, [userId]);
-    const profile = await getQuery(`SELECT * FROM user_profiles WHERE user_id = ?`, [userId]);
-    const allergies = await allQuery(`SELECT * FROM user_allergies WHERE user_id = ?`, [userId]);
-    const history = await allQuery(`SELECT * FROM medical_history WHERE user_id = ?`, [userId]);
-    const contacts = await allQuery(`SELECT * FROM emergency_contacts WHERE user_id = ? ORDER BY priority ASC`, [userId]);
-    const reports = await allQuery(`SELECT * FROM medical_reports WHERE user_id = ? ORDER BY report_date DESC`, [userId]);
+    const user = await User.findById(userId).select('name email phone role created_at').lean();
+    const profile = await UserProfile.findOne({ user_id: userId }).lean();
+    const allergies = await UserAllergy.find({ user_id: userId }).lean();
+    const history = await MedicalHistory.find({ user_id: userId }).lean();
+    const contacts = await EmergencyContact.find({ user_id: userId }).sort({ priority: 1 }).lean();
+    const reports = await MedicalReport.find({ user_id: userId }).sort({ report_date: -1 }).lean();
 
     res.json({ user, profile, allergies, history, contacts, reports });
   } catch (err) {
@@ -126,29 +134,29 @@ router.post('/user/profile', authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const { phone, blood_group, weight_kg, height_cm, allergies, history, contacts } = req.body;
 
-    if (phone) await runQuery(`UPDATE users SET phone = ? WHERE id = ?`, [phone, userId]);
+    if (phone) await User.findByIdAndUpdate(userId, { phone });
     if (blood_group || weight_kg || height_cm) {
-      await runQuery(
-        `INSERT INTO user_profiles (user_id, blood_group, weight_kg, height_cm) VALUES (?, ?, ?, ?)
-         ON CONFLICT(user_id) DO UPDATE SET blood_group=excluded.blood_group, weight_kg=excluded.weight_kg, height_cm=excluded.height_cm`,
-        [userId, blood_group, weight_kg, height_cm]
+      await UserProfile.findOneAndUpdate(
+        { user_id: userId },
+        { blood_group, weight_kg, height_cm },
+        { upsert: true, new: true }
       );
     }
 
     if (Array.isArray(allergies)) {
-      await runQuery(`DELETE FROM user_allergies WHERE user_id = ?`, [userId]);
+      await UserAllergy.deleteMany({ user_id: userId });
       for (const a of allergies) {
         if (a.allergen) {
-          await runQuery(`INSERT INTO user_allergies (user_id, allergen, severity, reaction) VALUES (?, ?, ?, ?)`, [userId, a.allergen, a.severity || 'moderate', a.reaction || '']);
+          await UserAllergy.create({ user_id: userId, allergen: a.allergen, severity: a.severity || 'moderate', reaction: a.reaction || '' });
         }
       }
     }
 
     if (Array.isArray(contacts)) {
-      await runQuery(`DELETE FROM emergency_contacts WHERE user_id = ?`, [userId]);
+      await EmergencyContact.deleteMany({ user_id: userId });
       for (const c of contacts) {
         if (c.name && c.phone) {
-          await runQuery(`INSERT INTO emergency_contacts (user_id, name, phone, relationship, priority) VALUES (?, ?, ?, ?, ?)`, [userId, c.name, c.phone, c.relationship || 'Relative', c.priority || 1]);
+          await EmergencyContact.create({ user_id: userId, name: c.name, phone: c.phone, relationship: c.relationship || 'Relative', priority: c.priority || 1 });
         }
       }
     }
@@ -163,33 +171,35 @@ router.post('/user/profile', authMiddleware, async (req, res) => {
 router.get('/medicines', async (req, res) => {
   try {
     const { q, category } = req.query;
-    let sql = `SELECT m.*,
-               GROUP_CONCAT(c.chemical_name || ' (' || c.strength || ')', ' + ') as composition_summary,
-               (SELECT MAX(s.saving_percentage) FROM substitutes s WHERE s.medicine_id = m.id) as generic_savings_pct
-               FROM medicines m
-               LEFT JOIN compositions c ON m.id = c.medicine_id`;
-    const params = [];
-    const conditions = [];
+    const filter = {};
 
     if (q) {
-      const cleanQ = q.toLowerCase().replace(/[^a-z0-9]/g, '');
-      conditions.push(`(LOWER(REPLACE(REPLACE(m.name, '-', ''), ' ', '')) LIKE ? OR LOWER(m.generic_name) LIKE ? OR LOWER(m.category) LIKE ? OR LOWER(c.chemical_name) LIKE ?)`);
-      const searchParam = `%${q}%`;
-      params.push(`%${cleanQ}%`, searchParam, searchParam, searchParam);
+      const regex = new RegExp(q, 'i');
+      filter.$or = [
+        { name: regex },
+        { generic_name: regex },
+        { category: regex }
+      ];
     }
 
     if (category) {
-      conditions.push(`m.category = ?`);
-      params.push(category);
+      filter.category = category;
     }
 
-    if (conditions.length > 0) {
-      sql += ` WHERE ` + conditions.join(' AND ');
-    }
+    const medicines = await Medicine.find(filter).sort({ name: 1 }).lean();
 
-    sql += ` GROUP BY m.id ORDER BY m.name ASC`;
-    const medicines = await allQuery(sql, params);
-    res.json(medicines);
+    // Add composition summary and generic savings for each medicine
+    const medicinesWithDetails = await Promise.all(medicines.map(async (med) => {
+      const compositions = await Composition.find({ medicine_id: med._id }).lean();
+      const composition_summary = compositions.map(c => `${c.chemical_name} (${c.strength})`).join(' + ');
+      
+      const substitutes = await Substitute.find({ medicine_id: med._id }).lean();
+      const generic_savings_pct = substitutes.length > 0 ? Math.max(...substitutes.map(s => s.saving_percentage)) : 0;
+
+      return { ...med, composition_summary, generic_savings_pct };
+    }));
+
+    res.json(medicinesWithDetails);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to search medicines' });
@@ -199,22 +209,19 @@ router.get('/medicines', async (req, res) => {
 router.get('/medicines/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const medicine = await getQuery(`SELECT * FROM medicines WHERE id = ?`, [id]);
+    const medicine = await Medicine.findById(id).lean();
     if (!medicine) return res.status(404).json({ error: 'Medicine not found' });
 
-    const compositions = await allQuery(`SELECT * FROM compositions WHERE medicine_id = ?`, [id]);
-    const sideEffects = await allQuery(`SELECT * FROM side_effects WHERE medicine_id = ?`, [id]);
+    const compositions = await Composition.find({ medicine_id: id }).lean();
+    const sideEffects = await SideEffect.find({ medicine_id: id }).lean();
     
-    // Substitutes with generic savings
-    const substitutes = await allQuery(
-      `SELECT s.*, m.name as substitute_name, m.generic_name, m.manufacturer, m.mrp as substitute_mrp, m.pack_size
-       FROM substitutes s
-       JOIN medicines m ON s.substitute_id = m.id
-       WHERE s.medicine_id = ?`,
-      [id]
-    );
+    const substitutes = await Substitute.find({ medicine_id: id }).lean();
+    const substitutesWithDetails = await Promise.all(substitutes.map(async (s) => {
+      const subMed = await Medicine.findById(s.substitute_id).lean();
+      return { ...s, ...subMed };
+    }));
 
-    res.json({ medicine, compositions, sideEffects, substitutes });
+    res.json({ medicine, compositions, sideEffects, substitutes: substitutesWithDetails });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch medicine details' });
   }
@@ -224,25 +231,22 @@ router.get('/medicines/:id', async (req, res) => {
 router.get('/diseases', async (req, res) => {
   try {
     const { q, category } = req.query;
-    let sql = `SELECT * FROM diseases`;
-    const params = [];
-    const conditions = [];
+    const filter = {};
 
     if (q) {
-      conditions.push(`(LOWER(name) LIKE ? OR LOWER(overview) LIKE ? OR LOWER(category) LIKE ?)`);
-      const p = `%${q}%`;
-      params.push(p, p, p);
+      const regex = new RegExp(q, 'i');
+      filter.$or = [
+        { name: regex },
+        { overview: regex },
+        { category: regex }
+      ];
     }
 
     if (category) {
-      conditions.push(`category = ?`);
-      params.push(category);
+      filter.category = category;
     }
 
-    if (conditions.length > 0) sql += ` WHERE ` + conditions.join(' AND ');
-    sql += ` ORDER BY name ASC`;
-
-    const diseases = await allQuery(sql, params);
+    const diseases = await Disease.find(filter).sort({ name: 1 }).lean();
     res.json(diseases);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch diseases' });
@@ -252,24 +256,21 @@ router.get('/diseases', async (req, res) => {
 router.get('/diseases/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const disease = await getQuery(`SELECT * FROM diseases WHERE id = ?`, [id]);
+    const disease = await Disease.findById(id).lean();
     if (!disease) return res.status(404).json({ error: 'Disease not found' });
 
-    const symptoms = await allQuery(
-      `SELECT s.* FROM symptoms s
-       JOIN disease_symptoms ds ON s.id = ds.symptom_id
-       WHERE ds.disease_id = ?`,
-      [id]
-    );
+    const diseaseSymptoms = await DiseaseSymptom.find({ disease_id: id }).lean();
+    const symptomIds = diseaseSymptoms.map(ds => ds.symptom_id);
+    const symptoms = await Symptom.find({ _id: { $in: symptomIds } }).lean();
 
-    const diet = await allQuery(`SELECT * FROM disease_diet WHERE disease_id = ?`, [id]);
-    const precautions = await allQuery(`SELECT * FROM disease_precautions WHERE disease_id = ? ORDER BY priority ASC`, [id]);
-    const linkedMedicines = await allQuery(
-      `SELECT dm.usage_note, m.* FROM disease_medicines dm
-       JOIN medicines m ON dm.medicine_id = m.id
-       WHERE dm.disease_id = ?`,
-      [id]
-    );
+    const diet = await DiseaseDiet.find({ disease_id: id }).lean();
+    const precautions = await DiseasePrecaution.find({ disease_id: id }).sort({ priority: 1 }).lean();
+    const diseaseMedicines = await DiseaseMedicine.find({ disease_id: id }).lean();
+    
+    const linkedMedicines = await Promise.all(diseaseMedicines.map(async (dm) => {
+      const med = await Medicine.findById(dm.medicine_id).lean();
+      return { ...med, usage_note: dm.usage_note };
+    }));
 
     res.json({ disease, symptoms, diet, precautions, linkedMedicines });
   } catch (err) {
@@ -280,7 +281,7 @@ router.get('/diseases/:id', async (req, res) => {
 // --- MODULE 3: SYMPTOM CHECKER ---
 router.get('/symptoms', async (req, res) => {
   try {
-    const symptoms = await allQuery(`SELECT * FROM symptoms ORDER BY body_region ASC, name ASC`);
+    const symptoms = await Symptom.find().sort({ body_region: 1, name: 1 }).lean();
     const grouped = symptoms.reduce((acc, sym) => {
       acc[sym.body_region] = acc[sym.body_region] || [];
       acc[sym.body_region].push(sym);
@@ -299,13 +300,13 @@ router.post('/symptom-checker/analyze', async (req, res) => {
     if (!Array.isArray(symptomIds)) symptomIds = [];
 
     // Parse custom text against database symptoms
-    const allSymptomsInDb = await allQuery(`SELECT id, name FROM symptoms`);
+    const allSymptomsInDb = await Symptom.find().select('name').lean();
     if (customText && customText.trim().length > 0) {
       const lowerText = customText.toLowerCase();
       allSymptomsInDb.forEach((s) => {
         const symNameLower = s.name.toLowerCase();
         if (lowerText.includes(symNameLower) || symNameLower.split(' ').some(w => w.length > 3 && lowerText.includes(w))) {
-          if (!symptomIds.includes(s.id)) symptomIds.push(s.id);
+          if (!symptomIds.includes(s._id.toString())) symptomIds.push(s._id.toString());
         }
       });
     }
@@ -314,16 +315,16 @@ router.post('/symptom-checker/analyze', async (req, res) => {
       return res.status(400).json({ error: 'Please select symptoms or describe your health condition in detail.' });
     }
 
-    const allDiseases = await allQuery(`SELECT * FROM diseases`);
+    const allDiseases = await Disease.find().lean();
     const results = [];
 
     for (const d of allDiseases) {
-      const dSymptoms = await allQuery(`SELECT symptom_id FROM disease_symptoms WHERE disease_id = ?`, [d.id]);
-      const diseaseSymIds = dSymptoms.map(x => x.symptom_id);
+      const dSymptoms = await DiseaseSymptom.find({ disease_id: d._id }).lean();
+      const diseaseSymIds = dSymptoms.map(x => x.symptom_id.toString());
       
       if (diseaseSymIds.length === 0) continue;
 
-      const matchedCount = symptomIds.filter(id => diseaseSymIds.includes(Number(id))).length;
+      const matchedCount = symptomIds.filter(id => diseaseSymIds.includes(id)).length;
       let scoreBonus = 0;
 
       // Check overview & symptoms for custom text keyword matches
@@ -375,7 +376,7 @@ router.post('/ocr/match', async (req, res) => {
     const cleanText = extractedText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
     const lines = cleanText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
 
-    const medicines = await allQuery(`SELECT id, name, generic_name, category, mrp FROM medicines`);
+    const medicines = await Medicine.find().select('id name generic_name category mrp').lean();
     
     // Levenshtein fuzzy string distance helper
     const levenshtein = (a, b) => {
@@ -431,15 +432,13 @@ router.post('/ocr/match', async (req, res) => {
 router.get('/stores', async (req, res) => {
   try {
     const { city, lat, lng } = req.query;
-    let sql = `SELECT * FROM medical_stores`;
-    const params = [];
+    const filter = {};
 
     if (city) {
-      sql += ` WHERE LOWER(city) LIKE ?`;
-      params.push(`%${city.toLowerCase()}%`);
+      filter.city = new RegExp(city, 'i');
     }
 
-    const stores = await allQuery(sql, params);
+    const stores = await MedicalStore.find(filter).lean();
 
     // Distance calculation (Haversine formula)
     const userLat = parseFloat(lat) || 17.4325; // Default Hyderabad if not given
@@ -469,30 +468,41 @@ router.get('/stores', async (req, res) => {
 router.get('/blood-banks', async (req, res) => {
   try {
     const { bloodGroup, city, lat, lng } = req.query;
-    let sql = `SELECT bb.*, bs.units_available, bs.last_updated
-               FROM blood_banks bb
-               JOIN blood_stock bs ON bb.id = bs.blood_bank_id`;
-    const params = [];
-    const conditions = [];
+    const filter = {};
 
-    if (bloodGroup) {
-      conditions.push(`bs.blood_group = ?`);
-      params.push(bloodGroup);
-    }
     if (city) {
-      conditions.push(`LOWER(bb.city) LIKE ?`);
-      params.push(`%${city.toLowerCase()}%`);
+      filter.city = new RegExp(city, 'i');
     }
 
-    if (conditions.length > 0) sql += ` WHERE ` + conditions.join(' AND ');
+    const banks = await BloodBank.find(filter).lean();
 
-    const banks = await allQuery(sql, params);
+    // Filter by blood group if specified
+    let banksWithStock = banks;
+    if (bloodGroup) {
+      const stockEntries = await BloodStock.find({ blood_group: bloodGroup }).lean();
+      const bankIdsWithStock = stockEntries.map(s => s.blood_bank_id.toString());
+      banksWithStock = banks.filter(b => bankIdsWithStock.includes(b._id.toString()));
+      
+      // Add stock info
+      banksWithStock = banksWithStock.map(b => {
+        const stock = stockEntries.find(s => s.blood_bank_id.toString() === b._id.toString());
+        return { ...b, units_available: stock?.units_available || 0, last_updated: stock?.last_updated };
+      });
+    } else {
+      // Get all stock for these banks
+      const bankIds = banks.map(b => b._id);
+      const stockEntries = await BloodStock.find({ blood_bank_id: { $in: bankIds } }).lean();
+      banksWithStock = banksWithStock.map(b => {
+        const bankStock = stockEntries.filter(s => s.blood_bank_id.toString() === b._id.toString());
+        return { ...b, stock: bankStock };
+      });
+    }
 
     const userLat = parseFloat(lat) || 17.4184;
     const userLng = parseFloat(lng) || 78.4385;
 
     const toRad = x => (x * Math.PI) / 180;
-    const banksWithDist = banks.map(b => {
+    const banksWithDist = banksWithStock.map(b => {
       const dLat = toRad(b.latitude - userLat);
       const dLng = toRad(b.longitude - userLng);
       const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -514,23 +524,16 @@ router.get('/blood-banks', async (req, res) => {
 router.get('/organ-banks', async (req, res) => {
   try {
     const { type, city } = req.query;
-    let sql = `SELECT * FROM organ_banks`;
-    const params = [];
-    const conditions = [];
+    const filter = {};
 
     if (type) {
-      conditions.push(`type = ?`);
-      params.push(type);
+      filter.type = type;
     }
     if (city) {
-      conditions.push(`LOWER(city) LIKE ?`);
-      params.push(`%${city.toLowerCase()}%`);
+      filter.city = new RegExp(city, 'i');
     }
 
-    if (conditions.length > 0) sql += ` WHERE ` + conditions.join(' AND ');
-    sql += ` ORDER BY name ASC`;
-
-    const organBanks = await allQuery(sql, params);
+    const organBanks = await OrganBank.find(filter).sort({ name: 1 }).lean();
     res.json(organBanks);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch organ banks' });
@@ -546,19 +549,21 @@ router.post('/sos/trigger', async (req, res) => {
 
     let contacts = [];
     if (userId) {
-      contacts = await allQuery(`SELECT * FROM emergency_contacts WHERE user_id = ?`, [userId]);
+      contacts = await EmergencyContact.find({ user_id: userId }).lean();
     }
 
     const contactsNotified = contacts.map(c => `${c.name} (${c.phone})`).join(', ') || 'National Ambulance 108 Dispatch';
     const mapsLink = `https://maps.google.com/?q=${userLat},${userLng}`;
 
-    const sosRes = await runQuery(
-      `INSERT INTO sos_events (user_id, latitude, longitude, contacts_notified) VALUES (?, ?, ?, ?)`,
-      [userId || null, userLat, userLng, contactsNotified]
-    );
+    const sosEvent = await SOSEvent.create({
+      user_id: userId || null,
+      latitude: userLat,
+      longitude: userLng,
+      contacts_notified: contactsNotified
+    });
 
     res.json({
-      sosId: sosRes.lastID,
+      sosId: sosEvent._id,
       message: '🚨 EMERGENCY SOS ACTIVATED! Location broadcasted.',
       locationUrl: mapsLink,
       ambulanceNumber: '108',
@@ -574,7 +579,7 @@ router.post('/sos/resolve', async (req, res) => {
   try {
     const { sosId } = req.body;
     if (sosId) {
-      await runQuery(`UPDATE sos_events SET resolved_at = CURRENT_TIMESTAMP WHERE id = ?`, [sosId]);
+      await SOSEvent.findByIdAndUpdate(sosId, { resolved_at: new Date() });
     }
     res.json({ message: 'Emergency marked as safe & resolved.' });
   } catch (err) {
@@ -732,7 +737,7 @@ router.get('/news', async (req, res) => {
       }
     ];
 
-    const tips = await allQuery(`SELECT * FROM health_tips WHERE is_active = 1`);
+    const tips = await HealthTip.find({ is_active: 1 }).lean();
     const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
     const dailyTip = tips.length > 0 ? tips[dayOfYear % tips.length] : { tip_text: 'Stay hydrated and active.', category: 'Wellness' };
 

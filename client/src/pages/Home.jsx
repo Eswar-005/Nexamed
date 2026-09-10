@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSOS } from '../context/SOSContext';
 import { useLanguage } from '../context/LanguageContext';
+import { apiFetch } from '../api';
 import {
   Search, Pill, Stethoscope,
   MapPin, Droplet, HeartHandshake, ShieldAlert,
@@ -19,12 +20,12 @@ export const Home = ({ setActiveTab, onSelectMedicine, onSearchMedicine, onSelec
   const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
-    fetch('/api/news')
+    apiFetch('/api/news')
       .then((res) => res.json())
       .then((data) => { setNewsFeed(data.news || []); setDailyTip(data.dailyTip); })
       .catch(() => {});
 
-    fetch('/api/medicines')
+    apiFetch('/api/medicines')
       .then((res) => res.json())
       .then((data) => setBestsellerMeds(data || []))
       .catch(() => {});

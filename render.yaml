@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: nexamed-backend
+    env: node
+    region: singapore
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true

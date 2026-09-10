@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { SOSProvider, useSOS } from './context/SOSContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { apiFetch } from './api';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { SOSModal } from './components/SOSModal';
@@ -88,7 +89,7 @@ export const MainApp = () => {
 
   const handleSelectMedicine = (id) => {
     setSelectedMedId(id);
-    fetch(`/api/medicines/${id}`)
+    apiFetch(`/api/medicines/${id}`)
       .then((res) => res.json())
       .then((data) => { setMedDetails(data); })
       .catch((err) => console.error(err));

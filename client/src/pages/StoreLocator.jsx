@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { MapPin, Phone, Clock, Navigation, CheckCircle, Search } from 'lucide-react';
 import L from 'leaflet';
+import { apiFetch } from '../api';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -28,7 +29,7 @@ export const StoreLocator = () => {
 
   const fetchStores = (city = '', lat = userLocation.lat, lng = userLocation.lng) => {
     setLoading(true);
-    fetch(`/api/stores?city=${encodeURIComponent(city)}&lat=${lat}&lng=${lng}`)
+    apiFetch(`/api/stores?city=${encodeURIComponent(city)}&lat=${lat}&lng=${lng}`)
       .then((res) => res.json())
       .then((data) => {
         setStores(data || []);

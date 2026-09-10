@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { apiFetch } from '../api';
 import {
   User, ShieldAlert, Plus, Mail, Lock,
   Eye, EyeOff, PhoneCall, FileText, FileSpreadsheet,
@@ -33,7 +34,7 @@ export const UserProfile = () => {
     setAuthLoading(true);
     const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
     try {
-      const res = await fetch(`/api${endpoint}`, {
+      const res = await apiFetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -61,7 +62,7 @@ export const UserProfile = () => {
     setAuthError('');
     setAuthLoading(true);
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'demo@nexamed.com', password: 'password123' })
@@ -84,7 +85,7 @@ export const UserProfile = () => {
     if (!allergenInput) return;
     const updated = [...userAllergies, { allergen: allergenInput, severity: allergySeverity, reaction: allergyReaction }];
     try {
-      await fetch('/api/user/profile', {
+      await apiFetch('/api/user/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ allergies: updated })

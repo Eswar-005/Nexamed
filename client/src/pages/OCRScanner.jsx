@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Tesseract from 'tesseract.js';
+import { apiFetch } from '../api';
 import {
   Scan,
   Camera,
@@ -79,7 +80,7 @@ export const OCRScanner = ({ onSelectMedicine }) => {
       setStatusText('Matching extracted text against medicine database...');
 
       // Call backend fuzzy Levenshtein match API
-      const res = await fetch('/api/ocr/match', {
+      const res = await apiFetch('/api/ocr/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ extractedText: rawText })
@@ -99,7 +100,7 @@ export const OCRScanner = ({ onSelectMedicine }) => {
     setTimeout(() => {
       const simulatedText = `${sampleName} TABLET\n15 Tablets\nParacetamol 650mg IP\nMfg Micro Labs Ltd\nMRP Rs 34.50`;
       setExtractedText(simulatedText);
-      fetch('/api/ocr/match', {
+      apiFetch('/api/ocr/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ extractedText: simulatedText })

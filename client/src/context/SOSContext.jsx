@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { useAuth } from './AuthContext';
+import { apiFetch } from '../api';
 
 const SOSContext = createContext();
 
@@ -29,7 +30,7 @@ export const SOSProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch('/api/sos/trigger', {
+      const res = await apiFetch('/api/sos/trigger', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lat, lng, userId: user?.id })
@@ -49,7 +50,7 @@ export const SOSProvider = ({ children }) => {
   const resolveSOS = async () => {
     if (sosDetails?.sosId) {
       try {
-        await fetch('/api/sos/resolve', {
+        await apiFetch('/api/sos/resolve', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sosId: sosDetails.sosId })

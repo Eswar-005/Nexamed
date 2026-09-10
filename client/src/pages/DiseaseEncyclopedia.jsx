@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../api';
 import {
   BookOpen, Search, CheckCircle, XCircle,
   AlertTriangle, Pill, ChevronRight, X
@@ -28,7 +29,7 @@ export const DiseaseEncyclopedia = ({ onSelectMedicine }) => {
   );
 
   const fetchDiseases = (q = '') => {
-    fetch(`/api/diseases?q=${encodeURIComponent(q)}`)
+    apiFetch(`/api/diseases?q=${encodeURIComponent(q)}`)
       .then((res) => res.json())
       .then((data) => setDiseases(data || []))
       .catch((err) => console.error(err));
@@ -37,7 +38,7 @@ export const DiseaseEncyclopedia = ({ onSelectMedicine }) => {
   useEffect(() => { fetchDiseases(''); }, []);
 
   const openDiseaseDetail = (id) => {
-    fetch(`/api/diseases/${id}`)
+    apiFetch(`/api/diseases/${id}`)
       .then((res) => res.json())
       .then((data) => { setSelectedDisease(data.disease); setDiseaseDetails(data); })
       .catch((err) => console.error(err));

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Newspaper, Award, Sparkles, Calendar, AlertTriangle, Filter, Globe, Zap, Search, RefreshCw, TrendingUp, BookOpen, Heart, Shield, FlaskConical, Pill, Clock, Bookmark, ChevronRight } from 'lucide-react';
+import { apiFetch } from '../api';
 
 const CATEGORIES = [
   { id: 'all',              label: 'All News',       icon: Newspaper,      color: '#0284c7', bg: '#0284c718' },
@@ -57,7 +58,7 @@ export const HealthNews = ({ onSelectNews }) => {
 
   useEffect(() => {
     setLoading(true);
-    fetch('/api/news')
+    apiFetch('/api/news')
       .then((res) => res.json())
       .then((data) => {
         setAllNews(data.news || []);

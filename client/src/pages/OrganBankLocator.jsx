@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HeartHandshake, Phone, ShieldCheck, ExternalLink, Award, CheckCircle2 } from 'lucide-react';
+import { apiFetch } from '../api';
 
 export const OrganBankLocator = () => {
   const [activeTab, setActiveTab] = useState('centers');
@@ -20,7 +21,7 @@ export const OrganBankLocator = () => {
 
   const fetchOrganBanks = (type = selectedType, c = city) => {
     setLoading(true);
-    fetch(`/api/organ-banks?type=${encodeURIComponent(type)}&city=${encodeURIComponent(c)}`)
+    apiFetch(`/api/organ-banks?type=${encodeURIComponent(type)}&city=${encodeURIComponent(c)}`)
       .then((res) => res.json())
       .then((data) => { setOrganBanks(data || []); setLoading(false); })
       .catch(() => setLoading(false));

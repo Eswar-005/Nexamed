@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Droplet, Phone, MapPin, Heart, CheckCircle2, Award, Search, Info, TrendingUp } from 'lucide-react';
+import { apiFetch } from '../api';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
@@ -32,7 +33,7 @@ export const BloodBankLocator = () => {
 
   const fetchBloodBanks = (bg = bloodGroup, c = city) => {
     setLoading(true);
-    fetch(`/api/blood-banks?bloodGroup=${encodeURIComponent(bg)}&city=${encodeURIComponent(c)}`)
+    apiFetch(`/api/blood-banks?bloodGroup=${encodeURIComponent(bg)}&city=${encodeURIComponent(c)}`)
       .then((res) => res.json())
       .then((data) => { setBanks(data || []); setLoading(false); })
       .catch(() => setLoading(false));
